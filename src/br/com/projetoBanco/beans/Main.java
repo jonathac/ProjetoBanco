@@ -19,8 +19,7 @@ public class Main {
 		System.out.println("2 - Depositar dinheiro");
 		System.out.println("3 - Consultar saldo");
 		System.out.println("4 - Sair");
-		System.out.println("4 - Sair");
-
+		
 	}
 
 	public static void main(String[] args) {
