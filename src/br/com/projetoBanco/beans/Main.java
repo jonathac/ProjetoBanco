@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
 
 	static void menu1() {
-		System.out.println("Selecione a opÁ„o desejada: ");
+		System.out.println("Selecione a op√ß√£o desejada: ");
 		System.out.println("1 - Cadastrar novo cliente");
 		System.out.println("2 - Cadastrar nova conta");
 		System.out.println("3 - Login");
@@ -14,10 +14,11 @@ public class Main {
 	}
 
 	static void menu2() {
-		System.out.println("Selecione a opÁ„o desejada: ");
+		System.out.println("Selecione a op√ß√£o desejada: ");
 		System.out.println("1 - Sacar dinheiro");
 		System.out.println("2 - Depositar dinheiro");
 		System.out.println("3 - Consultar saldo");
+		System.out.println("4 - Sair");
 		System.out.println("4 - Sair");
 
 	}
@@ -25,7 +26,7 @@ public class Main {
 	public static void main(String[] args) {
  		Scanner sc = new Scanner(System.in);
 
-		// Inst‚ncias
+		// Inst√¢ncias
 		Cliente cliente = new Cliente();
 		Conta conta = new Conta();
 		conta.setCliente(cliente);
@@ -54,11 +55,11 @@ public class Main {
 					break;
 
 				case 4:
-					System.out.println("O programa est· sendo finalizado...");
+					System.out.println("O programa est√° sendo finalizado...");
 					System.exit(0);
 
 				default:
-					System.out.println("OpÁ„o inv·lida, tente novamente...");
+					System.out.println("Op√ß√£o inv√°lida, tente novamente...");
 					break;
 				}
 			}
@@ -81,11 +82,11 @@ public class Main {
 					break;
 
 				case 4:
-					System.out.println("O programa est· sendo finalizado...");
+					System.out.println("O programa est√° sendo finalizado...");
 					System.exit(0);
 
 				default:
-					System.out.println("OpÁ„o inv·lida, tente novamente...");
+					System.out.println("Op√ß√£o inv√°lida, tente novamente...");
 					break;
 				}
 			}
