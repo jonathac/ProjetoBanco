@@ -10,7 +10,6 @@ public class Main {
 		System.out.println("2 - Cadastrar nova conta");
 		System.out.println("3 - Login");
 		System.out.println("4 - Sair");
-		System.out.println();
 
 	}
 
