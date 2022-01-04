@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
 
 	static void menu1() {
-		System.out.println("Selecione a opção desejada: ");
+		System.out.println("Selecione a opcao desejada: ");
 		System.out.println("1 - Cadastrar novo cliente");
 		System.out.println("2 - Cadastrar nova conta");
 		System.out.println("3 - Login");
@@ -14,7 +14,7 @@ public class Main {
 	}
 
 	static void menu2() {
-		System.out.println("Selecione a opção desejada: ");
+		System.out.println("Selecione a opcao desejada: ");
 		System.out.println("1 - Sacar dinheiro");
 		System.out.println("2 - Depositar dinheiro");
 		System.out.println("3 - Consultar saldo");
@@ -25,7 +25,7 @@ public class Main {
 	public static void main(String[] args) {
  		Scanner sc = new Scanner(System.in);
 
-		// Instâncias
+		// Instancias
 		Cliente cliente = new Cliente();
 		Conta conta = new Conta();
 		conta.setCliente(cliente);
@@ -54,11 +54,11 @@ public class Main {
 					break;
 
 				case 4:
-					System.out.println("O programa está sendo finalizado...");
+					System.out.println("O programa esta� sendo finalizado...");
 					System.exit(0);
 
 				default:
-					System.out.println("Opção inválida, tente novamente...");
+					System.out.println("Opcao invalida, tente novamente...");
 					break;
 				}
 			}
@@ -81,11 +81,11 @@ public class Main {
 					break;
 
 				case 4:
-					System.out.println("O programa está sendo finalizado...");
+					System.out.println("O programa esta sendo finalizado...");
 					System.exit(0);
 
 				default:
-					System.out.println("Opção inválida, tente novamente...");
+					System.out.println("Opcao invalida, tente novamente...");
 					break;
 				}
 			}
