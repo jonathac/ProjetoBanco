@@ -1,13 +1,21 @@
 package br.com.projetoBanco.beans;
 
-import java.util.Scanner;
-
 public class Cliente {
-	Scanner sc = new Scanner(System.in);
 
+	private String idCliente;
 	private String cpf;
 	private String nome;
+	private String dataNascimento;
 	private TipoCliente tipoCliente;
+	private Endereco endereco;
+
+	public String getIdCliente() {
+		return idCliente;
+	}
+
+	public void setIdCliente(String idCliente) {
+		this.idCliente = idCliente;
+	}
 
 	public String getCpf() {
 		return cpf;
@@ -25,6 +33,14 @@ public class Cliente {
 		this.nome = nome;
 	}
 
+	public String getDataNascimento() {
+		return dataNascimento;
+	}
+
+	public void setDataNascimento(String dataNascimento) {
+		this.dataNascimento = dataNascimento;
+	}
+
 	public TipoCliente getTipoCliente() {
 		return tipoCliente;
 	}
@@ -33,26 +49,12 @@ public class Cliente {
 		this.tipoCliente = tipoCliente;
 	}
 
-	public void cadastrarCliente() {
-		System.out.println("Cadastro de novo usuário");
-		System.out.println("Insira o nome completo");
-		setNome(sc.nextLine());
-
-		System.out.println("Informe os dígitos do CPF");
-		setCpf(sc.next());
-
-		while (!getCpf().matches("[0-9]*") || getCpf().length() != 11) {
-			System.out.println("Insira apenas os 11 digitos do CPF");
-			setCpf(sc.next());
-		}
-
-		System.out.println("Cadastrado com sucesso!!!");
-
+	public Endereco getEndereco() {
+		return endereco;
 	}
 
-	@Override
-	public String toString() {
-		return "Cliente: " + nome + "\n CPF: " + cpf;
-
+	public void setEndereco(Endereco endereco) {
+		this.endereco = endereco;
 	}
+	
 }
