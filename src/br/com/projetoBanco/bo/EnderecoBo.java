@@ -4,7 +4,7 @@ import br.com.projetoBanco.beans.Endereco;
 
 public class EnderecoBo {
 
-	public void cadastrarEndereco(String logradouro, String numero, String cep, String bairro, String cidade,
+	public Endereco cadastrarEndereco(String logradouro, String numero, String cep, String bairro, String cidade,
 			String estado) {
 
 		Endereco endereco = new Endereco();
@@ -16,6 +16,7 @@ public class EnderecoBo {
 		endereco.setCidade(cidade);
 		endereco.setEstado(estado);
 
+		return endereco;
 	}
 
 	public void buscarEndereco(String cep) {

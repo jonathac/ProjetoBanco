@@ -11,7 +11,7 @@ public class ClienteBo {
 
 	// cadastrar metodos
 
-	public void cadastrarDados(String cpf, String nome, String dataNascimento, TipoCliente tipoCliente,
+	public Cliente cadastrarDados(String cpf, String nome, String dataNascimento, 
 			Endereco endereco) {
 
 		Cliente cliente = new Cliente();
@@ -19,10 +19,11 @@ public class ClienteBo {
 		cliente.setIdCliente(UUID.randomUUID().toString());
 		cliente.setNome(nome);
 		cliente.setCpf(cpf);
-		cliente.setTipoCliente(tipoCliente);// como passar ?
+		cliente.setTipoCliente(TipoCliente.COMUM);// como passar ?
 		cliente.setEndereco(endereco);
 		cliente.setDataNascimento(dataNascimento);
 
+		return cliente;
 	}
 
 	public boolean validacaoCpf(String cpf) {

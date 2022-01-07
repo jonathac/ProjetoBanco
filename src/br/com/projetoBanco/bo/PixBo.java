@@ -7,7 +7,7 @@ import br.com.projetoBanco.beans.TipoChavePix;
 
 public class PixBo {
 
-	public void cadastrarPix(TipoChavePix tipoChavePix, String conteudoChavepix) {
+	public Pix cadastrarPix(TipoChavePix tipoChavePix, String conteudoChavepix) {
 		
 		Pix pix = new Pix();
 		
@@ -16,6 +16,7 @@ public class PixBo {
 		pix.setConteudoChave(conteudoChavepix);
 		pix.setAtivado(true);
 		
+		return pix;
 	}
 	
 }

@@ -10,11 +10,6 @@ public class ContaCorrenteBo {
 
 	// cadastrar metodos
 
-	/*
-	 * public double exibirSaldo () { ContaCorrente contaCorrente = new
-	 * ContaCorrente(); return contaCorrente.getSaldo(); }
-	 */
-
 	public void descontarTaxa() {
 		ContaCorrente contaCorrente = new ContaCorrente();
 		double saldoFinal = contaCorrente.getSaldo() * (1 - (contaCorrente.getTaxaManutencao() / 100));
@@ -22,14 +17,16 @@ public class ContaCorrenteBo {
 		contaCorrente.setSaldo(saldoFinal);
 	}
 
-	public void cadastrarContaCorrente(Cliente cliente) {
+	public ContaCorrente cadastrarContaCorrente(Cliente cliente) {
 
 		ContaCorrente contaCorrente = new ContaCorrente();
 
 		contaCorrente.setIdConta(UUID.randomUUID().toString());
 		contaCorrente.setNumeroConta(UUID.randomUUID().toString());
 		contaCorrente.setSaldo(0.0);
+		contaCorrente.setTaxaManutencao(0.45);
 
+		return contaCorrente;
 	}
 
 }

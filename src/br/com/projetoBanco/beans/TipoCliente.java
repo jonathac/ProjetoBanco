@@ -2,15 +2,6 @@ package br.com.projetoBanco.beans;
 
 public enum TipoCliente {
 
-	COMUM(0), SUPER(1), PREMIUM(2);
-	
-private final int valor;
-	
-	TipoCliente(int valorOpcao){
-		valor = valorOpcao;
+	COMUM, SUPER, PREMIUM;
+
 	}
-	public int getValor(){
-		return valor;
-	}
-	
-}
