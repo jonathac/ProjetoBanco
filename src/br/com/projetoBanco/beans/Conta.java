@@ -39,4 +39,11 @@ public class Conta {
 		this.cliente = cliente;
 	}
 
+	@Override
+	public String toString() {
+		return "Conta [idConta=" + idConta + ", numeroConta=" + numeroConta + ", saldo=" + saldo + ", cliente="
+				+ cliente + "]";
+	}
+
+	
 }

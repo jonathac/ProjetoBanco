@@ -12,6 +12,7 @@ import br.com.projetoBanco.beans.Endereco;
 import br.com.projetoBanco.beans.Pix;
 import br.com.projetoBanco.beans.TipoChavePix;
 import br.com.projetoBanco.bo.ClienteBo;
+import br.com.projetoBanco.bo.ContaBo;
 import br.com.projetoBanco.bo.ContaCorrenteBo;
 import br.com.projetoBanco.bo.ContaPoupancaBo;
 import br.com.projetoBanco.bo.EnderecoBo;
@@ -187,7 +188,7 @@ public class MenuPrincipal {
 		}
 		opcao = sc.nextInt();
 
-		while (opcao != (cliente.size() - 1)) {
+		while (opcao < 0 || opcao > (cliente.size() - 1)) {
 			System.out.println("Insira um valor válido: ");
 			opcao = sc.nextInt();
 		}
@@ -195,23 +196,46 @@ public class MenuPrincipal {
 	}
 
 	public void transacoes() {
-		System.out.println("---Transações---");
-		System.out.println("Não funcionaaaaaaaaaa");
-		/*
+
 		String clienteTransacao;
 		System.out.println("---Transações---");
 		System.out.println("Selecione a conta que deseja acessar: ");
 		opcao = selecionarCliente();
 		clienteTransacao = cliente.get(opcao).getNome();
-		System.out.println("---Transações---");
-		System.out.println("Tipo de conta");
-		
+		opcao = selecionarConta(clienteTransacao);
+
+		switch (opcao) {
+
+		case 0:
+			System.out.println("Acesso negado, tente novamente!!!");
+			opcao = -1;
+			break;
+		case 1:
+			// acessar conta corrente
+			opcao = acessarContaCorrente(clienteTransacao);
+			subMenuTransacoesContaCorrente(opcao);
+			opcao = -1;
+			break;
+		case 2:
+//acessar conta poupanca
+			break;
+		default:
+			System.out.println("Acesso negado, tente novamente!!!");
+			opcao = -1;
+			break;
+
+		}
+
+	}
+
+	public void subMenuTransacoesContaCorrente(int indiceCliente) {
 
 		System.out.println("---Transações---");
 		System.out.println("1- Deposito");
 		System.out.println("2- Saque");
 		System.out.println("3- Transferência");
 		System.out.println("4- Pix");
+		System.out.println("5- Saldo");
 		System.out.println("0- Sair");
 		opcao = sc.nextInt();
 
@@ -221,22 +245,41 @@ public class MenuPrincipal {
 			opcao = -1;
 			break;
 		case 1:
-
+			System.out.println("---Deposito---");
+			System.out.println("Insira um valor para o depósito: ");
+			
+			double deposito = sc.nextDouble();
+			contaCorrente.get(indiceCliente).setSaldo(contaCorrenteBo.depositar(contaCorrente.get(indiceCliente).getSaldo(), deposito));
+			
+			///////////// gambi, mas funciona
+			opcao = -1;
 			break;
 		case 2:
 
+			opcao = -1;
 			break;
 		case 3:
 
+			opcao = -1;
 			break;
 		case 4:
 
+			opcao = -1;
+			break;
+		case 5:
+			System.out.println("---Saldo---");
+			System.out.println("Cliente: " + contaCorrente.get(indiceCliente).getCliente().getNome());
+			System.out.println("Seu saldo: " + contaCorrente.get(indiceCliente).getSaldo());
+			System.out.println("Seu tipo de conta é: " + contaCorrente.get(indiceCliente).getCliente().getTipoCliente());
+			
+			opcao = -1;
 			break;
 		default:
-			System.out.println("Informe um valor válido!!!");
+			System.out.println("Opção inválida, tente novamente!!!");
+			opcao = -1;
 			break;
 		}
-*/
+
 	}
 
 	public void cadastrarChavePix(int cliente) {
@@ -291,9 +334,55 @@ public class MenuPrincipal {
 		}
 	}
 
-	// teste
-	public void acessarContaCorrente(int cliente) {
+	public int selecionarConta(String cliente) {
+		String opcaoConta;
+		int retorno;
+		System.out.println("---Transações---");
+		System.out.println("Selecione a opcao de conta: ");
 
+		for (int i = 0; i < contaCorrente.size(); i++) {
+			if (contaCorrente.get(i).getCliente().getNome().equals(cliente)) {
+				System.out.println("CC - Conta Corrente");
+			}
+		}
+		for (int i = 0; i < contaPoupanca.size(); i++) {
+			if (contaPoupanca.get(i).getCliente().getNome().equals(cliente)) {
+				System.out.println("CP - Conta Poupanca");
+			}
+		}
+		opcaoConta = sc.next().toLowerCase();
+
+		while (!opcaoConta.equals("cc") && !opcaoConta.equals("cp")) {
+			System.out.println("Insira uma opção válida: ");
+			opcaoConta = sc.next();
+		}
+
+		if (opcaoConta.equals("cc")) {
+			retorno = 1;
+		} else if (opcaoConta.equals("cp")) {
+			retorno = 2;
+		} else {
+			retorno = 0;
+		}
+
+		return retorno;
+		// pensar em metodo que devolva tipo de conta a se acessar, levar usuario a
+		// conta corrente ou conta poupanca
+	}
+
+	// teste
+	public int acessarContaCorrente(String clienteTransacao) {
+		int retorno = -1;
+		for (int i = 0; i < contaCorrente.size(); i++) {
+			if(contaCorrente.get(i).getCliente().getNome().equals(clienteTransacao)) {
+				retorno = i;
+			}
+			else {
+				retorno = -1;
+			}
+		}
+		
+		return retorno;
 	}
 
 }

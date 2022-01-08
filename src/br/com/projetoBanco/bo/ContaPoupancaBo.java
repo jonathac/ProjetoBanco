@@ -23,6 +23,7 @@ public class ContaPoupancaBo {
 		contaPoupanca.setNumeroConta(UUID.randomUUID().toString());
 		contaPoupanca.setSaldo(0.0);
 		contaPoupanca.setTaxaRendimento(0.3);
+		contaPoupanca.setCliente(cliente);
 
 		return contaPoupanca;
 	}

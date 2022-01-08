@@ -16,9 +16,10 @@ public class ContaBo {
 		// igual sprint1
 	}
 
-	public void depositar(double valorDepositar) {
+	public void depositar(Cliente cliente, double valorDepositar) {
 		Conta conta = new Conta();
 		conta.setSaldo(conta.getSaldo() + valorDepositar);
+		
 	}
 
 	public void saque(double valorSaque) {
