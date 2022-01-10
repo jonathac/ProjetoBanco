@@ -53,6 +53,7 @@ public class MenuPrincipal {
 	EnderecoBo enderecoBo = new EnderecoBo();
 	ContaCorrenteBo contaCorrenteBo = new ContaCorrenteBo();
 	ContaPoupancaBo contaPoupancaBo = new ContaPoupancaBo();
+	ContaBo contaBo = new ContaBo();
 	PixBo pixBo = new PixBo();
 
 	public void menuPrincipal() {
@@ -154,15 +155,37 @@ public class MenuPrincipal {
 		case 1:
 			opcao = selecionarCliente();
 			// Criar conta corrente
-			contaCorrente.add(contaCorrenteBo.cadastrarContaCorrente(cliente.get(opcao)));
-			System.out.println("Conta cadastrada com sucesso!!!");
+			for (int i = 0; i < contaCorrente.size() || i == 0; i++) {
+				if (contaCorrente.size() == 0) {
+					contaCorrente.add(contaCorrenteBo.cadastrarContaCorrente(cliente.get(opcao)));
+					System.out.println("Conta cadastrada com sucesso!!!");
+					break;
+				} else if (contaCorrente.get(i).getCliente().getNome().equals(cliente.get(opcao).getNome())) {
+					System.out.println("Conta Corrente já existente...");
+					
+				} else {
+					contaCorrente.add(contaCorrenteBo.cadastrarContaCorrente(cliente.get(opcao)));
+					System.out.println("Conta cadastrada com sucesso!!!");
+				}
+			}
 			opcao = -1;
 			break;
 		case 2:
 			opcao = selecionarCliente();
 			// Criar conta Poupança
-			contaPoupanca.add(contaPoupancaBo.cadastrarContaPoupanca(cliente.get(opcao)));
-			System.out.println("Conta cadastrada com sucesso!!!");
+			for (int i = 0; i < contaPoupanca.size() || i == 0; i++) {
+				if (contaPoupanca.size() == 0) {
+					contaPoupanca.add(contaPoupancaBo.cadastrarContaPoupanca(cliente.get(opcao)));
+					System.out.println("Conta cadastrada com sucesso!!!");
+					break;
+				} else if (contaPoupanca.get(i).getCliente().getNome().equals(cliente.get(opcao).getNome())) {
+					System.out.println("Conta Poupanca já existente...");
+				} else {
+					contaPoupanca.add(contaPoupancaBo.cadastrarContaPoupanca(cliente.get(opcao)));
+					System.out.println("Conta cadastrada com sucesso!!!");
+				}
+			}
+
 			opcao = -1;
 			break;
 		case 3:
@@ -217,7 +240,9 @@ public class MenuPrincipal {
 			opcao = -1;
 			break;
 		case 2:
-//acessar conta poupanca
+			opcao = acessarContaPoupanca(clienteTransacao);
+			subMenuTransacoesContaPoupanca(opcao);
+			opcao = -1;
 			break;
 		default:
 			System.out.println("Acesso negado, tente novamente!!!");
@@ -229,6 +254,12 @@ public class MenuPrincipal {
 	}
 
 	public void subMenuTransacoesContaCorrente(int indiceCliente) {
+
+		boolean status = false;
+		double deposito = 0.0;
+		double saque = 0.0;
+		double valorTransferir = 0.0;
+		String clienteTransacao;
 
 		System.out.println("---Transações---");
 		System.out.println("1- Deposito");
@@ -247,31 +278,207 @@ public class MenuPrincipal {
 		case 1:
 			System.out.println("---Deposito---");
 			System.out.println("Insira um valor para o depósito: ");
-			
-			double deposito = sc.nextDouble();
-			contaCorrente.get(indiceCliente).setSaldo(contaCorrenteBo.depositar(contaCorrente.get(indiceCliente).getSaldo(), deposito));
-			
-			///////////// gambi, mas funciona
+
+			deposito = sc.nextDouble();
+			contaBo.depositar(contaCorrente.get(indiceCliente), deposito);
+			System.out.println("Deposito realizado com sucesso!!!");
 			opcao = -1;
 			break;
 		case 2:
+			System.out.println("---Saque---");
+			System.out.println("Insira um valor para o depósito: ");
+
+			saque = sc.nextDouble();
+			status = contaBo.saque(contaCorrente.get(indiceCliente), saque);
+
+			if (status == true) {
+				System.out.println("Saque realizado com sucesso!!!");
+			} else {
+				System.out.println("Saldo indispónivel, tente novamente...");
+			}
 
 			opcao = -1;
 			break;
 		case 3:
+			System.out.println("---Transferência---");
+			System.out.println("Insira um valor para a transferência: ");
+			valorTransferir = sc.nextDouble();
+			System.out.println("Selecione a conta que deseja enviar o valor: ");
+			opcao = selecionarCliente();
+			clienteTransacao = cliente.get(opcao).getNome();
+			opcao = selecionarConta(clienteTransacao);
 
+			switch (opcao) {
+
+			case 0:
+				System.out.println("Acesso negado, tente novamente!!!");
+				opcao = -1;
+				break;
+			case 1:
+				// conta corrente ----> conta corrente
+				opcao = acessarContaCorrente(clienteTransacao);
+				status = contaBo.transferencia(valorTransferir, contaCorrente.get(indiceCliente),
+						contaCorrente.get(opcao), false);
+				if (status == true) {
+					System.out.println("Transferencia realizada com sucesso...");
+
+				} else {
+					System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+				}
+				opcao = -1;
+				break;
+			case 2:
+				// conta corrente ----> conta poupanca
+				opcao = acessarContaPoupanca(clienteTransacao);
+				status = contaBo.transferencia(valorTransferir, contaCorrente.get(indiceCliente),
+						contaPoupanca.get(opcao), true);
+				if (status == true) {
+					System.out.println("Transferencia realizada com sucesso...");
+					// taxa transacao corrente --- poupanca
+				} else {
+					System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+				}
+				opcao = -1;
+				break;
+
+			default:
+				System.out.println("Acesso negado, tente novamente!!!");
+				opcao = -1;
+				break;
+
+			}
 			opcao = -1;
 			break;
 		case 4:
-
+//construir pix
 			opcao = -1;
 			break;
 		case 5:
+			// construir metodo
 			System.out.println("---Saldo---");
 			System.out.println("Cliente: " + contaCorrente.get(indiceCliente).getCliente().getNome());
-			System.out.println("Seu saldo: " + contaCorrente.get(indiceCliente).getSaldo());
-			System.out.println("Seu tipo de conta é: " + contaCorrente.get(indiceCliente).getCliente().getTipoCliente());
-			
+			System.out.println("Seu saldo é R$: " + contaCorrente.get(indiceCliente).getSaldo());
+			System.out
+					.println("Seu tipo de conta é: " + contaCorrente.get(indiceCliente).getCliente().getTipoCliente());
+
+			opcao = -1;
+			break;
+		default:
+			System.out.println("Opção inválida, tente novamente!!!");
+			opcao = -1;
+			break;
+		}
+
+	}
+
+	public void subMenuTransacoesContaPoupanca(int indiceCliente) {
+
+		boolean status = false;
+		double deposito = 0.0;
+		double saque = 0.0;
+		double valorTransferir = 0.0;
+		String clienteTransacao;
+
+		System.out.println("---Transações---");
+		System.out.println("1- Deposito");
+		System.out.println("2- Saque");
+		System.out.println("3- Transferência");
+		System.out.println("4- Pix");
+		System.out.println("5- Saldo");
+		System.out.println("0- Sair");
+		opcao = sc.nextInt();
+
+		switch (opcao) {
+
+		case 0:
+			opcao = -1;
+			break;
+		case 1:
+			System.out.println("---Deposito---");
+			System.out.println("Insira um valor para o depósito: ");
+
+			deposito = sc.nextDouble();
+			contaBo.depositar(contaPoupanca.get(indiceCliente), deposito);
+			System.out.println("Deposito realizado com sucesso!!!");
+			opcao = -1;
+			break;
+		case 2:
+			System.out.println("---Saque---");
+			System.out.println("Insira um valor para o depósito: ");
+
+			saque = sc.nextDouble();
+			status = contaBo.saque(contaPoupanca.get(indiceCliente), saque);
+
+			if (status == true) {
+				System.out.println("Saque realizado com sucesso!!!");
+			} else {
+				System.out.println("Saldo indispónivel, tente novamente...");
+			}
+
+			opcao = -1;
+			break;
+		case 3:
+			System.out.println("---Transferência---");
+			System.out.println("Insira um valor para a transferência: ");
+			valorTransferir = sc.nextDouble();
+			System.out.println("Selecione a conta que deseja enviar o valor: ");
+			opcao = selecionarCliente();
+			clienteTransacao = cliente.get(opcao).getNome();
+			opcao = selecionarConta(clienteTransacao);
+
+			switch (opcao) {
+
+			case 0:
+				System.out.println("Acesso negado, tente novamente!!!");
+				opcao = -1;
+				break;
+			case 1:
+				// conta poupanca ----> conta poupanca
+				opcao = acessarContaPoupanca(clienteTransacao);
+				status = contaBo.transferencia(valorTransferir, contaPoupanca.get(indiceCliente),
+						contaPoupanca.get(opcao), false);
+				if (status == true) {
+					System.out.println("Transferencia realizada com sucesso...");
+
+				} else {
+					System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+				}
+				opcao = -1;
+				break;
+			case 2:
+				// conta poupanca ----> conta poupanca
+				opcao = acessarContaPoupanca(clienteTransacao);
+				status = contaBo.transferencia(valorTransferir, contaPoupanca.get(indiceCliente),
+						contaCorrente.get(opcao), true);
+				if (status == true) {
+					System.out.println("Transferencia realizada com sucesso...");
+					// taxa transacao corrente --- poupanca
+				} else {
+					System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+				}
+				opcao = -1;
+				break;
+
+			default:
+				System.out.println("Acesso negado, tente novamente!!!");
+				opcao = -1;
+				break;
+
+			}
+			opcao = -1;
+			break;
+		case 4:
+//construir pix
+			opcao = -1;
+			break;
+		case 5:
+			// construir metodo
+			System.out.println("---Saldo---");
+			System.out.println("Cliente: " + contaPoupanca.get(indiceCliente).getCliente().getNome());
+			System.out.println("Seu saldo é R$: " + contaPoupanca.get(indiceCliente).getSaldo());
+			System.out
+					.println("Seu tipo de conta é: " + contaPoupanca.get(indiceCliente).getCliente().getTipoCliente());
+
 			opcao = -1;
 			break;
 		default:
@@ -370,18 +577,29 @@ public class MenuPrincipal {
 		// conta corrente ou conta poupanca
 	}
 
-	// teste
 	public int acessarContaCorrente(String clienteTransacao) {
 		int retorno = -1;
 		for (int i = 0; i < contaCorrente.size(); i++) {
-			if(contaCorrente.get(i).getCliente().getNome().equals(clienteTransacao)) {
+			if (contaCorrente.get(i).getCliente().getNome().equals(clienteTransacao)) {
 				retorno = i;
-			}
-			else {
+			} else {
 				retorno = -1;
 			}
 		}
-		
+
+		return retorno;
+	}
+
+	public int acessarContaPoupanca(String clienteTransacao) {
+		int retorno = -1;
+		for (int i = 0; i < contaPoupanca.size(); i++) {
+			if (contaPoupanca.get(i).getCliente().getNome().equals(clienteTransacao)) {
+				retorno = i;
+			} else {
+				retorno = -1;
+			}
+		}
+
 		return retorno;
 	}
 

@@ -1,12 +1,11 @@
 package br.com.projetoBanco.bo;
 
-import java.util.UUID;
-
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.Conta;
 
 public class ContaBo {
 
+	private Conta conta;
 	// cadastrar metodos
 
 	public double exibirSaldo() {
@@ -16,26 +15,49 @@ public class ContaBo {
 		// igual sprint1
 	}
 
-	public void depositar(Cliente cliente, double valorDepositar) {
-		Conta conta = new Conta();
+	//funcao ok
+	public void depositar(Conta conta, double valorDepositar) {
+
 		conta.setSaldo(conta.getSaldo() + valorDepositar);
-		
 	}
 
-	public void saque(double valorSaque) {
-		Conta conta = new Conta();
-		conta.setSaldo(conta.getSaldo() - valorSaque);
-	}
-
-	public void transferencia(double valorTransferir) {
-		Conta conta = new Conta();
-		conta.setSaldo(conta.getSaldo() - valorTransferir);
-	}
-
-	public boolean validarSaldo(double valor) {
+	//funcao ok
+	public boolean saque(Conta conta, double valorSaque) {
 		boolean retorno = false;
-		Conta conta = new Conta();
 
+		if (validarSaldo(valorSaque,conta) == true) {
+			conta.setSaldo(conta.getSaldo() - valorSaque);
+			retorno = true;
+		}
+
+		return retorno;
+	}
+
+	
+	public boolean transferencia(double valorTransferir,Conta contaEnviar, Conta contaReceber, boolean taxa) {
+		boolean retorno = false;
+		
+		if (taxa == true) {
+			if (contaEnviar.getSaldo()>(valorTransferir + 5.6)) {
+				contaEnviar.setSaldo(contaEnviar.getSaldo()-valorTransferir);
+				contaReceber.setSaldo(valorTransferir + contaReceber.getSaldo());
+				taxaTransferencia(contaEnviar);
+				retorno = true;
+			}
+		}
+		else if (validarSaldo(valorTransferir,contaEnviar)==true) {
+			contaEnviar.setSaldo(contaEnviar.getSaldo()-valorTransferir);
+			contaReceber.setSaldo(valorTransferir + contaReceber.getSaldo());
+			retorno = true;
+		}
+		
+		return retorno;
+	}
+
+	//função ok
+	public boolean validarSaldo(double valor, Conta conta) {
+		boolean retorno = false;
+		
 		if (conta.getSaldo() > valor) {
 			retorno = true;
 		} else {
@@ -45,6 +67,7 @@ public class ContaBo {
 		return retorno;
 	}
 
+	//função ok
 	public void cadastrarConta(Cliente cliente) {
 
 		ContaCorrenteBo contaCorrentebo = new ContaCorrenteBo();
@@ -52,4 +75,7 @@ public class ContaBo {
 		contaCorrentebo.cadastrarContaCorrente(cliente);
 	}
 
+	public void taxaTransferencia (Conta contaEnviar) {
+		contaEnviar.setSaldo(contaEnviar.getSaldo()- 5.6);
+	}
 }

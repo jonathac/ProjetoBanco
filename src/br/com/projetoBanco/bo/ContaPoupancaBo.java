@@ -8,6 +8,8 @@ import br.com.projetoBanco.beans.ContaPoupanca;
 
 public class ContaPoupancaBo {
 
+	private ContaPoupanca contaPoupanca;
+	
 	public void acrescentarRendimento() {
 		ContaPoupanca contaPoupanca = new ContaPoupanca();
 		double saldoFinal = contaPoupanca.getSaldo() * (1 + (contaPoupanca.getTaxaRendimento() / 100));

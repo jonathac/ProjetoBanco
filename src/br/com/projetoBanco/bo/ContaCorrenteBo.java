@@ -8,6 +8,8 @@ import br.com.projetoBanco.beans.ContaCorrente;
 
 public class ContaCorrenteBo {
 
+	private ContaCorrente contaCorrente;
+	
 	// cadastrar metodos
 
 	public void descontarTaxa() {
@@ -30,11 +32,9 @@ public class ContaCorrenteBo {
 		return contaCorrente;
 	}
 
-	public double depositar(double saldo, double valorDepositar) {
+	public void depositar(ContaCorrente contaCorrente, double valorDepositar) {
 		
-		saldo += valorDepositar;
-		
-		return saldo;
+		contaCorrente.setSaldo(contaCorrente.getSaldo()+valorDepositar);
 	}
 
 	public void saque(double valorSaque) {
