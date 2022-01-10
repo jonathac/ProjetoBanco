@@ -6,6 +6,7 @@ public class Conta {
 	private String numeroConta;
 	private double saldo;
 	private Cliente cliente;
+	private Pix pix;
 
 	public String getIdConta() {
 		return idConta;
@@ -39,10 +40,12 @@ public class Conta {
 		this.cliente = cliente;
 	}
 
-	@Override
-	public String toString() {
-		return "Conta [idConta=" + idConta + ", numeroConta=" + numeroConta + ", saldo=" + saldo + ", cliente="
-				+ cliente + "]";
+	public Pix getPix() {
+		return pix;
+	}
+
+	public void setPix(Pix pix) {
+		this.pix = pix;
 	}
 
 	

@@ -8,11 +8,12 @@ public class ContaBo {
 	private Conta conta;
 	// cadastrar metodos
 
-	public double exibirSaldo() {
-		Conta conta = new Conta();
-		return conta.getSaldo();
-
-		// igual sprint1
+	public String exibirSaldo(Conta conta) {
+		
+		
+		return "Cliente: " + conta.getCliente().getNome() +
+				"\nCPF: " + conta.getCliente().getCpf() + 
+				"\nSaldo: R$ " + conta.getSaldo();
 	}
 
 	//funcao ok
@@ -33,7 +34,7 @@ public class ContaBo {
 		return retorno;
 	}
 
-	
+	//funcao ok
 	public boolean transferencia(double valorTransferir,Conta contaEnviar, Conta contaReceber, boolean taxa) {
 		boolean retorno = false;
 		

@@ -11,14 +11,5 @@ public class ContaCorrente extends Conta {
 	public void setTaxaManutencao(double taxaManutencao) {
 		this.taxaManutencao = taxaManutencao;
 	}
-
-	@Override
-	public String toString() {
-		return "ContaCorrente [taxaManutencao=" + taxaManutencao + ", getIdConta()=" + getIdConta()
-				+ ", getNumeroConta()=" + getNumeroConta() + ", getSaldo()=" + getSaldo() + ", getCliente()="
-				+ getCliente() + "]";
-	}
-
-
 	
 }
