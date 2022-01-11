@@ -10,8 +10,8 @@ public class ContaPoupancaBo {
 
 	private ContaPoupanca contaPoupanca;
 	
-	public void acrescentarRendimento() {
-		ContaPoupanca contaPoupanca = new ContaPoupanca();
+	public void acrescentarRendimento(ContaPoupanca contaPoupanca) {
+		
 		double saldoFinal = contaPoupanca.getSaldo() * (1 + (contaPoupanca.getTaxaRendimento() / 100));
 
 		contaPoupanca.setSaldo(saldoFinal);

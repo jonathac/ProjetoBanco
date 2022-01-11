@@ -63,6 +63,7 @@ public class MenuPrincipal {
 			System.out.println("1- Cadastrar Cliente");
 			System.out.println("2- Cadastrar Conta/Pix");
 			System.out.println("3- Transações");
+			System.out.println("4- Cobrar Taxas/Rendimentos");
 			System.out.println("0- Sair");
 
 			opcao = sc.nextInt();
@@ -88,6 +89,17 @@ public class MenuPrincipal {
 
 			case 3:
 				transacoes();
+				break;
+
+			case 4:
+
+				for (int i = 0; i < contaCorrente.size(); i++) {
+					cobraTaxaManutencao(contaCorrente.get(i));
+				}
+				for (int i = 0; i < contaPoupanca.size(); i++) {
+					cobraTaxaRendimento(contaPoupanca.get(i));
+				}
+				System.out.println("Taxas aplicadas e rendimentos aplicadas com sucesso!!!");
 				break;
 
 			default:
@@ -357,7 +369,7 @@ public class MenuPrincipal {
 			valorTransferir = sc.nextDouble();
 			status = contaBo.transferencia(valorTransferir, contaCorrente.get(indiceCliente),
 					consultarChavePix(chavePix), false);
-			
+
 			if (status == true) {
 				System.out.println("Transferencia realizada com sucesso...");
 			} else {
@@ -368,7 +380,8 @@ public class MenuPrincipal {
 			break;
 		case 5:
 			System.out.println("---Saldo---");
-			System.out.println(contaBo.exibirSaldo(contaCorrente.get(indiceCliente)));
+			System.out.println(contaBo.exibirSaldo(contaCorrente.get(indiceCliente),contaCorrente.get(indiceCliente).getCliente()));
+			
 			opcao = -1;
 			break;
 		default:
@@ -484,7 +497,7 @@ public class MenuPrincipal {
 			valorTransferir = sc.nextDouble();
 			status = contaBo.transferencia(valorTransferir, contaPoupanca.get(indiceCliente),
 					consultarChavePix(chavePix), false);
-			
+
 			if (status == true) {
 				System.out.println("Transferencia realizada com sucesso...");
 			} else {
@@ -495,7 +508,7 @@ public class MenuPrincipal {
 			break;
 		case 5:
 			System.out.println("---Saldo---");
-			System.out.println(contaBo.exibirSaldo(contaPoupanca.get(indiceCliente)));
+			System.out.println(contaBo.exibirSaldo(contaPoupanca.get(indiceCliente),contaPoupanca.get(indiceCliente).getCliente()));
 			opcao = -1;
 			break;
 		default:
@@ -507,62 +520,62 @@ public class MenuPrincipal {
 	}
 
 	public void cadastrarChavePix(int cliente) {
-		if(contaCorrente.get(acessarContaCorrente(this.cliente.get(cliente).getNome())).getPix().isAtivado())
-		{
+		if (contaCorrente.get(acessarContaCorrente(this.cliente.get(cliente).getNome())).getPix().isAtivado()) {
 			System.out.println("Chave pix já cadastrada.");
 		} else {
-		
-		System.out.println("---Cadastrar Chave Pix---");
-		System.out.println("Cliente selecionado: " + this.cliente.get(cliente).getNome());
-		System.out.println("Selecione o tipo de chave Pix a cadastrar:");
-		System.out.println("1- CPF");
-		System.out.println("2- E-mail");
-		System.out.println("3- Telefone");
-		System.out.println("4- Aleatorio");
-		opcao = sc.nextInt();
-		sc.nextLine();
-		
-		switch (opcao) {
 
-		case 0:
-			opcao = -1;
-			break;
-		case 1:
-			tipoChavePix = tipoChavePix.CPF;
-			conteudoChavePix = this.cliente.get(cliente).getCpf();
-			opcao = -1;
-			break;
-		case 2:
-			tipoChavePix = tipoChavePix.EMAIL;
-			conteudoChavePix = sc.nextLine();
-			opcao = -1;
-			break;
-		case 3:
-			tipoChavePix = tipoChavePix.TELEFONE;
-			conteudoChavePix = sc.nextLine();
-			opcao = -1;
-			break;
-		case 4:
-			tipoChavePix = tipoChavePix.ALEATORIO;
-			conteudoChavePix = UUID.randomUUID().toString();
-			System.out.println("Sua chave Pix selecionado é: " + conteudoChavePix);
-			opcao = -1;
-			break;
-		default:
-			System.out.println("PIX não cadastrado, tente novamente");
-			opcao = -1;
-			break;
+			System.out.println("---Cadastrar Chave Pix---");
+			System.out.println("Cliente selecionado: " + this.cliente.get(cliente).getNome());
+			System.out.println("Selecione o tipo de chave Pix a cadastrar:");
+			System.out.println("1- CPF");
+			System.out.println("2- E-mail");
+			System.out.println("3- Telefone");
+			System.out.println("4- Aleatorio");
+			opcao = sc.nextInt();
+			sc.nextLine();
+
+			switch (opcao) {
+
+			case 0:
+				opcao = -1;
+				break;
+			case 1:
+				tipoChavePix = tipoChavePix.CPF;
+				conteudoChavePix = this.cliente.get(cliente).getCpf();
+				opcao = -1;
+				break;
+			case 2:
+				tipoChavePix = tipoChavePix.EMAIL;
+				conteudoChavePix = sc.nextLine();
+				opcao = -1;
+				break;
+			case 3:
+				tipoChavePix = tipoChavePix.TELEFONE;
+				conteudoChavePix = sc.nextLine();
+				opcao = -1;
+				break;
+			case 4:
+				tipoChavePix = tipoChavePix.ALEATORIO;
+				conteudoChavePix = UUID.randomUUID().toString();
+				System.out.println("Sua chave Pix selecionado é: " + conteudoChavePix);
+				opcao = -1;
+				break;
+			default:
+				System.out.println("PIX não cadastrado, tente novamente");
+				opcao = -1;
+				break;
+			}
+
+			pix.add(pixBo.cadastrarPix(tipoChavePix, conteudoChavePix));
+
+			this.pixBo.addPixConta(contaCorrente.get(acessarContaCorrente(this.cliente.get(cliente).getNome())),
+					pix.get(pix.size() - 1));
+			if (pix.get(pix.size() - 1).isAtivado() == true) {
+				System.out.println("Sua chave pix está ativa.");
+				System.out.println("Tipo de chave selecionada: " + pix.get(pix.size() - 1).getTipoChave());
+				System.out.println("Chave cadastrada: " + pix.get(pix.size() - 1).getConteudoChave());
+			}
 		}
-
-		pix.add(pixBo.cadastrarPix(tipoChavePix, conteudoChavePix));
-
-		this.pixBo.addPixConta(contaCorrente.get(acessarContaCorrente(this.cliente.get(cliente).getNome())), pix.get(pix.size()-1));
-		if (pix.get(pix.size() - 1).isAtivado() == true) {
-			System.out.println("Sua chave pix está ativa.");
-			System.out.println("Tipo de chave selecionada: " + pix.get(pix.size() - 1).getTipoChave());
-			System.out.println("Chave cadastrada: " + pix.get(pix.size() - 1).getConteudoChave());
-		}
-	}
 	}
 
 	public int selecionarConta(String cliente) {
@@ -636,5 +649,12 @@ public class MenuPrincipal {
 		return conta;
 	}
 
+	public void cobraTaxaManutencao(ContaCorrente contaCorrente) {
+		contaCorrenteBo.descontarTaxa(contaCorrente);
+	}
+
+	public void cobraTaxaRendimento(ContaPoupanca contaPoupanca) {
+		contaPoupancaBo.acrescentarRendimento(contaPoupanca);
+	}
 
 }

@@ -2,18 +2,32 @@ package br.com.projetoBanco.bo;
 
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.Conta;
+import br.com.projetoBanco.beans.TipoCliente;
 
 public class ContaBo {
 
 	private Conta conta;
+	
 	// cadastrar metodos
 
-	public String exibirSaldo(Conta conta) {
+	public String exibirSaldo(Conta conta, Cliente cliente) {
 		
+		TipoCliente tipoCliente;
+		
+		if (conta.getSaldo() <= 5000) {
+			tipoCliente = TipoCliente.COMUM;
+		} else if (conta.getSaldo() > 5000 && conta.getSaldo() <= 14999) {
+			tipoCliente = TipoCliente.SUPER;
+		} else {
+			tipoCliente = TipoCliente.PREMIUM;
+		}
+		
+		cliente.setTipoCliente(tipoCliente);
 		
 		return "Cliente: " + conta.getCliente().getNome() +
 				"\nCPF: " + conta.getCliente().getCpf() + 
-				"\nSaldo: R$ " + conta.getSaldo();
+				"\nSaldo: R$ " + conta.getSaldo() +
+				"\nTipo de conta: " + cliente.getTipoCliente();
 	}
 
 	//funcao ok

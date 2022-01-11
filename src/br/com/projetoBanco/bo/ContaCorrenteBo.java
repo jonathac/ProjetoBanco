@@ -12,8 +12,8 @@ public class ContaCorrenteBo {
 	
 	// cadastrar metodos
 
-	public void descontarTaxa() {
-		ContaCorrente contaCorrente = new ContaCorrente();
+	public void descontarTaxa(ContaCorrente contaCorrente) {
+		
 		double saldoFinal = contaCorrente.getSaldo() * (1 - (contaCorrente.getTaxaManutencao() / 100));
 
 		contaCorrente.setSaldo(saldoFinal);
