@@ -81,6 +81,7 @@ public class MenuPrincipal {
 				break;
 			case 1:
 				cadastroCliente();
+				menuCadastroConta();
 				break;
 
 			case 2:

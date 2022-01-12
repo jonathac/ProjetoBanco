@@ -7,13 +7,12 @@ import br.com.projetoBanco.beans.TipoCliente;
 public class ContaBo {
 
 	private Conta conta;
-	
+
 	// cadastrar metodos
 
 	public String exibirSaldo(Conta conta, Cliente cliente) {
-		
+
 		TipoCliente tipoCliente;
-		
 		if (conta.getSaldo() <= 5000) {
 			tipoCliente = TipoCliente.COMUM;
 		} else if (conta.getSaldo() > 5000 && conta.getSaldo() <= 14999) {
@@ -21,26 +20,24 @@ public class ContaBo {
 		} else {
 			tipoCliente = TipoCliente.PREMIUM;
 		}
-		
+
 		cliente.setTipoCliente(tipoCliente);
-		
-		return "Cliente: " + conta.getCliente().getNome() +
-				"\nCPF: " + conta.getCliente().getCpf() + 
-				"\nSaldo: R$ " + conta.getSaldo() +
-				"\nTipo de conta: " + cliente.getTipoCliente();
+
+		return "Cliente: " + conta.getCliente().getNome() + "\nCPF: " + conta.getCliente().getCpf() + "\nSaldo: R$ "
+				+ conta.getSaldo() + "\nTipo de conta: " + cliente.getTipoCliente();
 	}
 
-	//funcao ok
+	// funcao ok
 	public void depositar(Conta conta, double valorDepositar) {
 
 		conta.setSaldo(conta.getSaldo() + valorDepositar);
 	}
 
-	//funcao ok
+	// funcao ok
 	public boolean saque(Conta conta, double valorSaque) {
 		boolean retorno = false;
 
-		if (validarSaldo(valorSaque,conta) == true) {
+		if (validarSaldo(valorSaque, conta) == true) {
 			conta.setSaldo(conta.getSaldo() - valorSaque);
 			retorno = true;
 		}
@@ -48,31 +45,30 @@ public class ContaBo {
 		return retorno;
 	}
 
-	//funcao ok
-	public boolean transferencia(double valorTransferir,Conta contaEnviar, Conta contaReceber, boolean taxa) {
+	// funcao ok
+	public boolean transferencia(double valorTransferir, Conta contaEnviar, Conta contaReceber, boolean taxa) {
 		boolean retorno = false;
-		
+
 		if (taxa == true) {
-			if (contaEnviar.getSaldo()>(valorTransferir + 5.6)) {
-				contaEnviar.setSaldo(contaEnviar.getSaldo()-valorTransferir);
+			if (contaEnviar.getSaldo() > (valorTransferir + 5.6)) {
+				contaEnviar.setSaldo(contaEnviar.getSaldo() - valorTransferir);
 				contaReceber.setSaldo(valorTransferir + contaReceber.getSaldo());
 				taxaTransferencia(contaEnviar);
 				retorno = true;
 			}
-		}
-		else if (validarSaldo(valorTransferir,contaEnviar)==true) {
-			contaEnviar.setSaldo(contaEnviar.getSaldo()-valorTransferir);
+		} else if (validarSaldo(valorTransferir, contaEnviar) == true) {
+			contaEnviar.setSaldo(contaEnviar.getSaldo() - valorTransferir);
 			contaReceber.setSaldo(valorTransferir + contaReceber.getSaldo());
 			retorno = true;
 		}
-		
+
 		return retorno;
 	}
 
-	//função ok
+	// função ok
 	public boolean validarSaldo(double valor, Conta conta) {
 		boolean retorno = false;
-		
+
 		if (conta.getSaldo() > valor) {
 			retorno = true;
 		} else {
@@ -82,7 +78,7 @@ public class ContaBo {
 		return retorno;
 	}
 
-	//função ok
+	// função ok
 	public void cadastrarConta(Cliente cliente) {
 
 		ContaCorrenteBo contaCorrentebo = new ContaCorrenteBo();
@@ -90,7 +86,7 @@ public class ContaBo {
 		contaCorrentebo.cadastrarContaCorrente(cliente);
 	}
 
-	public void taxaTransferencia (Conta contaEnviar) {
-		contaEnviar.setSaldo(contaEnviar.getSaldo()- 5.6);
+	public void taxaTransferencia(Conta contaEnviar) {
+		contaEnviar.setSaldo(contaEnviar.getSaldo() - 5.6);
 	}
 }
