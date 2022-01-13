@@ -7,7 +7,7 @@ public class Pix {
 	private double valor;
 	private String data;
 	private String conteudoChave;
-	private boolean isAtivado;
+	private boolean isAtivado = false;
 	private Conta conta;
 
 	public String getIdPix() {

@@ -1,5 +1,6 @@
 package br.com.projetoBanco.bo;
 
+import java.util.Date;
 import java.util.UUID;
 
 import br.com.projetoBanco.beans.Cliente;
@@ -11,7 +12,7 @@ public class ClienteBo {
 
 	// cadastrar metodos
 
-	public Cliente cadastrarDados(String cpf, String nome, String dataNascimento, 
+	public Cliente cadastrarDados(String cpf, String nome, Date dataNascimento, 
 			Endereco endereco) {
 
 		Cliente cliente = new Cliente();

@@ -1,11 +1,13 @@
 package br.com.projetoBanco.beans;
 
+import java.util.Date;
+
 public class Cliente {
 
 	private String idCliente;
 	private String cpf;
 	private String nome;
-	private String dataNascimento;
+	private Date dataNascimento;
 	private TipoCliente tipoCliente;
 	private Endereco endereco;
 
@@ -33,11 +35,11 @@ public class Cliente {
 		this.nome = nome;
 	}
 
-	public String getDataNascimento() {
+	public Date getDataNascimento() {
 		return dataNascimento;
 	}
 
-	public void setDataNascimento(String dataNascimento) {
+	public void setDataNascimento(Date dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}
 

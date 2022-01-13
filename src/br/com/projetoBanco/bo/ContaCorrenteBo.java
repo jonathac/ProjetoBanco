@@ -28,6 +28,7 @@ public class ContaCorrenteBo {
 		contaCorrente.setSaldo(0.0);
 		contaCorrente.setTaxaManutencao(0.45);
 		contaCorrente.setCliente(cliente);
+		contaCorrente.setPix(null);
 
 		return contaCorrente;
 	}
