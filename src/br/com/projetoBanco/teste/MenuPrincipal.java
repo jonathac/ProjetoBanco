@@ -38,10 +38,10 @@ public class MenuPrincipal {
 
 	// variaveis tipo objeto
 
-	ArrayList<Cliente> cliente = new ArrayList<Cliente>();
-	ArrayList<Endereco> endereco = new ArrayList<Endereco>();
-	ArrayList<ContaCorrente> contaCorrente = new ArrayList<ContaCorrente>();
-	ArrayList<ContaPoupanca> contaPoupanca = new ArrayList<ContaPoupanca>();
+	ArrayList<Cliente> cliente = new ArrayList<>();
+	ArrayList<Endereco> endereco = new ArrayList<>();
+	ArrayList<ContaCorrente> contaCorrente = new ArrayList<>();
+	ArrayList<ContaPoupanca> contaPoupanca = new ArrayList<>();
 	ArrayList<Pix> pix = new ArrayList<Pix>();
 
 	// Cliente[] cliente = new Cliente[10];
@@ -80,8 +80,56 @@ public class MenuPrincipal {
 
 				break;
 			case 1:
+				boolean status = false;
 				cadastroCliente();
-				menuCadastroConta();
+				do {
+					System.out.println("---Cadastro de conta---");
+					System.out.println("1- Cadastrar Conta Corrente");
+					System.out.println("2- Cadastrar Conta Poupanca");
+					opcao = sc.nextInt();
+				} while (opcao != 1 && opcao != 2);
+
+				switch (opcao) {
+
+				case 1:
+					
+					for (ContaCorrente obj : contaCorrente) {
+						if (obj.getCliente().getNome().equals(cliente.get(cliente.size()-1).getNome())) {
+							status = true;
+						}
+					}
+
+					if (status == true) {
+						System.out.println("Conta Corrente já existente...");
+					} else {
+						contaCorrente.add(contaCorrenteBo.cadastrarContaCorrente(cliente.get(cliente.size()-1)));
+						System.out.println("Conta cadastrada com sucesso!!!");
+					}
+					opcao = -1;
+					break;
+				case 2:
+					
+					for (ContaPoupanca obj : contaPoupanca) {
+						if (obj.getCliente().getNome().equals(cliente.get(cliente.size()-1).getNome())) {
+							status = true;
+						}
+					}
+
+					if (status == true) {
+						System.out.println("Conta Corrente já existente...");
+					} else {
+						contaPoupanca.add(contaPoupancaBo.cadastrarContaPoupanca(cliente.get(cliente.size()-1)));
+						System.out.println("Conta cadastrada com sucesso!!!");
+					}
+					opcao = -1;
+					break;
+
+				default:
+					System.out.println("Erro");
+					opcao = -1;
+					break;
+
+				}
 				break;
 
 			case 2:
@@ -94,12 +142,18 @@ public class MenuPrincipal {
 
 			case 4:
 
-				for (int i = 0; i < contaCorrente.size(); i++) {
-					cobraTaxaManutencao(contaCorrente.get(i));
+				for (ContaCorrente obj : contaCorrente) {
+
+					cobraTaxaManutencao(obj);
+
 				}
-				for (int i = 0; i < contaPoupanca.size(); i++) {
-					cobraTaxaRendimento(contaPoupanca.get(i));
+
+				for (ContaPoupanca obj : contaPoupanca) {
+
+					cobraTaxaRendimento(obj);
+
 				}
+
 				System.out.println("Taxas aplicadas e rendimentos aplicadas com sucesso!!!");
 				break;
 
@@ -111,6 +165,7 @@ public class MenuPrincipal {
 	}
 
 	public void cadastroCliente() {
+		boolean sair = false;
 		sc.nextLine();
 		System.out.println("Cadastro Cliente");
 		System.out.println("Insira o nome: ");
@@ -121,34 +176,44 @@ public class MenuPrincipal {
 			System.out.println("Insira um valor válido para cpf: ");
 			cpfCliente = sc.nextLine();
 		}
-		System.out.println("Insira sua data de nascimento: ");
-		dataNascimentoCliente = sc.nextLine();
-
-		System.out.println("---Endereco---");
-		System.out.println("Insira o cep: ");
-		cepCliente = sc.nextLine();
-		while (enderecoBo.validarCep(cepCliente) == false) {
-			System.out.println("Insira um valor válido para o cep: ");
-			cepCliente = sc.nextLine();
+		for (Cliente obj : cliente) {
+			if (obj.getCpf().equals(cpfCliente)) {
+				System.out.println("CPF já cadastrado");
+				System.out.println("Tente outra opcao");
+				sair = true;
+			}
 		}
-		System.out.println("Insira o logradouro: ");
-		logradouroCliente = sc.nextLine();
-		System.out.println("Insira o numero: ");
-		numeroCliente = sc.nextLine();
-		System.out.println("Insira o bairro: ");
-		bairroCliente = sc.nextLine();
-		System.out.println("Insira a cidade: ");
-		cidadeCliente = sc.nextLine();
-		System.out.println("Insira o estado: ");
-		estadoCliente = sc.nextLine();
+		if (sair == false) {
+			System.out.println("Insira sua data de nascimento: ");
+			dataNascimentoCliente = sc.nextLine();
 
-		endereco.add(enderecoBo.cadastrarEndereco(logradouroCliente, numeroCliente, cepCliente, bairroCliente,
-				cidadeCliente, estadoCliente));
+			System.out.println("---Endereco---");
+			System.out.println("Insira o cep: ");
+			cepCliente = sc.nextLine();
+			while (enderecoBo.validarCep(cepCliente) == false) {
+				System.out.println("Insira um valor válido para o cep: ");
+				cepCliente = sc.nextLine();
+			}
+			System.out.println("Insira o logradouro: ");
+			logradouroCliente = sc.nextLine();
+			System.out.println("Insira o numero: ");
+			numeroCliente = sc.nextLine();
+			System.out.println("Insira o bairro: ");
+			bairroCliente = sc.nextLine();
+			System.out.println("Insira a cidade: ");
+			cidadeCliente = sc.nextLine();
+			System.out.println("Insira o estado: ");
+			estadoCliente = sc.nextLine();
 
-		cliente.add(clienteBo.cadastrarDados(cpfCliente, nomeCliente, dataNascimentoCliente,
-				endereco.get(endereco.size() - 1)));
+			endereco.add(enderecoBo.cadastrarEndereco(logradouroCliente, numeroCliente, cepCliente, bairroCliente,
+					cidadeCliente, estadoCliente));
 
-		System.out.println("Cliente " + cliente.get(cliente.size() - 1).getNome() + " cadastrado!");
+			cliente.add(clienteBo.cadastrarDados(cpfCliente, nomeCliente, dataNascimentoCliente,
+					endereco.get(endereco.size() - 1)));
+
+			System.out.println("Cliente " + cliente.get(cliente.size() - 1).getNome() + " cadastrado!");
+		}
+
 	}
 
 	public void menuCadastroConta() {
@@ -157,7 +222,7 @@ public class MenuPrincipal {
 		System.out.println("---Cadastro de conta---");
 		System.out.println("1- Cadastrar Conta Corrente");
 		System.out.println("2- Cadastrar Conta Poupanca");
-		System.out.println("3- Cadastrar chave pix");
+		System.out.println("3- Cadastrar Chave Pix");
 		System.out.println("0- Sair");
 		opcao = sc.nextInt();
 
@@ -217,8 +282,10 @@ public class MenuPrincipal {
 	public int selecionarCliente() {
 		System.out.println("Selecione o Cliente:");
 
-		for (int i = 0; i < cliente.size(); i++) {
-			System.out.println(i + "- " + cliente.get(i).getNome());
+		for (Cliente obj : cliente) {
+
+			System.out.println(cliente.indexOf(obj) + "- " + obj.getNome());
+
 		}
 		opcao = sc.nextInt();
 
@@ -381,8 +448,9 @@ public class MenuPrincipal {
 			break;
 		case 5:
 			System.out.println("---Saldo---");
-			System.out.println(contaBo.exibirSaldo(contaCorrente.get(indiceCliente),contaCorrente.get(indiceCliente).getCliente()));
-			
+			System.out.println(contaBo.exibirSaldo(contaCorrente.get(indiceCliente),
+					contaCorrente.get(indiceCliente).getCliente()));
+
 			opcao = -1;
 			break;
 		default:
@@ -509,7 +577,8 @@ public class MenuPrincipal {
 			break;
 		case 5:
 			System.out.println("---Saldo---");
-			System.out.println(contaBo.exibirSaldo(contaPoupanca.get(indiceCliente),contaPoupanca.get(indiceCliente).getCliente()));
+			System.out.println(contaBo.exibirSaldo(contaPoupanca.get(indiceCliente),
+					contaPoupanca.get(indiceCliente).getCliente()));
 			opcao = -1;
 			break;
 		default:
@@ -585,13 +654,14 @@ public class MenuPrincipal {
 		System.out.println("---Transações---");
 		System.out.println("Selecione a opcao de conta: ");
 
-		for (int i = 0; i < contaCorrente.size(); i++) {
-			if (contaCorrente.get(i).getCliente().getNome().equals(cliente)) {
+		for (ContaCorrente obj : contaCorrente) {
+			if (obj.getCliente().getNome().equals(cliente)) {
 				System.out.println("CC - Conta Corrente");
 			}
 		}
-		for (int i = 0; i < contaPoupanca.size(); i++) {
-			if (contaPoupanca.get(i).getCliente().getNome().equals(cliente)) {
+
+		for (ContaPoupanca obj : contaPoupanca) {
+			if (obj.getCliente().getNome().equals(cliente)) {
 				System.out.println("CP - Conta Poupanca");
 			}
 		}
@@ -617,9 +687,10 @@ public class MenuPrincipal {
 
 	public int acessarContaCorrente(String clienteTransacao) {
 		int retorno = -1;
-		for (int i = 0; i < contaCorrente.size(); i++) {
-			if (contaCorrente.get(i).getCliente().getNome().equals(clienteTransacao)) {
-				retorno = i;
+
+		for (ContaCorrente obj : contaCorrente) {
+			if (obj.getCliente().getNome().equals(clienteTransacao)) {
+				retorno = contaCorrente.indexOf(obj);
 			}
 		}
 
@@ -628,9 +699,10 @@ public class MenuPrincipal {
 
 	public int acessarContaPoupanca(String clienteTransacao) {
 		int retorno = -1;
-		for (int i = 0; i < contaPoupanca.size(); i++) {
-			if (contaPoupanca.get(i).getCliente().getNome().equals(clienteTransacao)) {
-				retorno = i;
+
+		for (ContaPoupanca obj : contaPoupanca) {
+			if (obj.getCliente().getNome().equals(clienteTransacao)) {
+				retorno = contaPoupanca.indexOf(obj);
 			}
 		}
 
