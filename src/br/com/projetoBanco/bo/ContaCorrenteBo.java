@@ -5,15 +5,16 @@ import java.util.UUID;
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.Conta;
 import br.com.projetoBanco.beans.ContaCorrente;
+import br.com.projetoBanco.beans.Pix;
 
 public class ContaCorrenteBo {
 
 	private ContaCorrente contaCorrente;
-	
+
 	// cadastrar metodos
 
 	public void descontarTaxa(ContaCorrente contaCorrente) {
-		
+
 		double saldoFinal = contaCorrente.getSaldo() * (1 - (contaCorrente.getTaxaManutencao() / 100));
 
 		contaCorrente.setSaldo(saldoFinal);
@@ -22,20 +23,21 @@ public class ContaCorrenteBo {
 	public ContaCorrente cadastrarContaCorrente(Cliente cliente) {
 
 		ContaCorrente contaCorrente = new ContaCorrente();
+		Pix pix = new Pix();
 
 		contaCorrente.setIdConta(UUID.randomUUID().toString());
 		contaCorrente.setNumeroConta(UUID.randomUUID().toString());
 		contaCorrente.setSaldo(0.0);
 		contaCorrente.setTaxaManutencao(0.45);
 		contaCorrente.setCliente(cliente);
-		contaCorrente.setPix(null);
+		contaCorrente.setPix(pix);
 
 		return contaCorrente;
 	}
 
 	public void depositar(ContaCorrente contaCorrente, double valorDepositar) {
-		
-		contaCorrente.setSaldo(contaCorrente.getSaldo()+valorDepositar);
+
+		contaCorrente.setSaldo(contaCorrente.getSaldo() + valorDepositar);
 	}
 
 	public void saque(double valorSaque) {

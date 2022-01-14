@@ -35,5 +35,13 @@ public class PixBo {
 		return retorno;
 	}
 	
-	
+ 	public boolean validaPix(Pix pix) {
+		boolean valida = false;
+		
+		if(pix.isAtivado()) {
+			valida = true;
+		}
+		
+		return valida;
+	}
 }

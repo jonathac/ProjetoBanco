@@ -66,11 +66,11 @@ public class BancoDados {
 
 	}
 
-	public ContaPoupanca acessarContaPoupanca(String clienteTransacao) {
+	public ContaPoupanca acessarContaPoupanca(Cliente cliente) {
 		ContaPoupanca retorno = null;
 
-		for (ContaPoupanca obj : getContaPoupanca()) {
-			if (obj.getCliente().getNome().equals(clienteTransacao)) {
+		for (ContaPoupanca obj : contaPoupanca) {
+			if (obj.getCliente().equals(cliente)) {
 				retorno = obj;
 			}
 		}
@@ -82,20 +82,20 @@ public class BancoDados {
 
 		Conta conta = null;
 
-		for (ContaCorrente contaCorrente : getContaCorrente()) {
-			if (contaCorrente.getPix().getConteudoChave().equals(chavePix)) {
-				conta = contaCorrente;
+		for (ContaCorrente obj : contaCorrente) {
+			if (obj.getPix().getConteudoChave().equals(chavePix)) {
+				conta = obj;
 			}
 		}
 
 		return conta;
 	}
 
-	public ContaCorrente acessarContaCorrente(String clienteTransacao) {
+	public ContaCorrente acessarContaCorrente(Cliente cliente) {
 		ContaCorrente retorno = null;
 
-		for (ContaCorrente obj : getContaCorrente()) {
-			if (obj.getCliente().getNome().equals(clienteTransacao)) {
+		for (ContaCorrente obj : contaCorrente) {
+			if (obj.getCliente().equals(cliente)) {
 				retorno = obj;
 			}
 		}
@@ -103,5 +103,15 @@ public class BancoDados {
 		return retorno;
 	}
 
-	
+	public Cliente buscarCliente (String cpf) {
+		Cliente cliente = null;
+		
+		for (Cliente obj : this.cliente) {
+			if (obj.getCpf().equals(cpf)) {
+				cliente = obj;
+			}
+		}
+		
+		return cliente;
+	}
 }

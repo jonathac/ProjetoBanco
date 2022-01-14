@@ -10,6 +10,7 @@ import br.com.projetoBanco.Utils.BancoDados;
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
+import br.com.projetoBanco.beans.Pix;
 import br.com.projetoBanco.beans.TipoChavePix;
 import br.com.projetoBanco.bo.ClienteBo;
 import br.com.projetoBanco.bo.ContaBo;
@@ -61,12 +62,14 @@ public class MenuPrincipal {
 			case 1:
 				bancoDados.cadastrarContaCorrente(contaCorrenteBo
 						.cadastrarContaCorrente(bancoDados.getCliente().get(bancoDados.getCliente().size() - 1)));
+				bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
 				opcao = -1;
 				break;
 			case 2:
 				bancoDados.cadastrarContaPoupanca(contaPoupancaBo
 						.cadastrarContaPoupanca(bancoDados.getCliente().get(bancoDados.getCliente().size() - 1)));
+				bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
 				opcao = -1;
 				break;
@@ -247,26 +250,43 @@ public class MenuPrincipal {
 	}
 
 	public void menuCadastroConta() {
+		System.out.println("---Cadastro de conta---");
+		System.out.println("Informe o CPF do cliente titular da conta: ");
+		cpfCliente = sc.nextLine();
+		while (clienteBo.validacaoCpf(cpfCliente) == false) {
+			System.out.println("Insira um valor válido para cpf: ");
+			cpfCliente = sc.nextLine();
+		}
+		
 		boolean status = false;
 
+		try {
+			
+		bancoDados.buscarCliente(cpfCliente).equals(null);
+		
 		System.out.println("---Cadastro de conta---");
 		System.out.println("1- Cadastrar Conta Corrente");
 		System.out.println("2- Cadastrar Conta Poupanca");
 		System.out.println("3- Cadastrar Chave Pix");
 		System.out.println("0- Sair");
 		opcao = sc.nextInt();
-
+			
+		} catch (Exception e) {
+			System.out.println("Cliente nao encontrado!!!");
+			System.out.println("Tente Novamente...");
+			opcao = 0;
+		}
+		
 		switch (opcao) {
 
 		case 0:
 			opcao = -1;
 			break;
 		case 1:
-			opcao = selecionarCliente();
 			// Criar conta corrente
 
-			for (ContaCorrente contaCorrente : bancoDados.getContaCorrente()) {
-				if (contaCorrente.getCliente().getNome().equals(bancoDados.getCliente().get(opcao).getNome())) {
+			for (ContaCorrente obj : bancoDados.getContaCorrente()) {
+				if (obj.getCliente().getNome().equals(bancoDados.buscarCliente(cpfCliente).getNome())) {
 					status = true;
 				}
 			}
@@ -275,16 +295,16 @@ public class MenuPrincipal {
 				System.out.println("Conta Corrente já existente...");
 			} else {
 				bancoDados.getContaCorrente()
-						.add(contaCorrenteBo.cadastrarContaCorrente(bancoDados.getCliente().get(opcao)));
+						.add(contaCorrenteBo.cadastrarContaCorrente(bancoDados.buscarCliente(cpfCliente)));
+			//	bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
 			}
 			opcao = -1;
 			break;
 		case 2:
-			opcao = selecionarCliente();
 			// Criar conta Poupança
 			for (ContaPoupanca contaPoupanca : bancoDados.getContaPoupanca()) {
-				if (contaPoupanca.getCliente().getNome().equals(bancoDados.getCliente().get(opcao).getNome())) {
+				if (contaPoupanca.getCliente().getNome().equals(bancoDados.buscarCliente(cpfCliente).getNome())) {
 					status = true;
 				}
 			}
@@ -292,16 +312,15 @@ public class MenuPrincipal {
 			if (status == true) {
 				System.out.println("Conta Poupanca já existente...");
 			} else {
-				bancoDados.getContaPoupanca()
-						.add(contaPoupancaBo.cadastrarContaPoupanca(bancoDados.getCliente().get(opcao)));
+				bancoDados.getContaPoupanca().add(contaPoupancaBo.cadastrarContaPoupanca((bancoDados.buscarCliente(cpfCliente))));
+			//	bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
 			}
 
 			opcao = -1;
 			break;
 		case 3:
-			opcao = selecionarCliente();
-			cadastrarChavePix(opcao);
+			cadastrarChavePix(bancoDados.buscarCliente(cpfCliente));
 			opcao = -1;
 			break;
 		default:
@@ -330,27 +349,39 @@ public class MenuPrincipal {
 
 	public void transacoes() {
 
-		String clienteTransacao;
+		
 		System.out.println("---Transações---");
-		System.out.println("Selecione a conta que deseja acessar: ");
-		opcao = selecionarCliente();
-		clienteTransacao = bancoDados.getCliente().get(opcao).getNome();
-		opcao = selecionarConta(clienteTransacao);
+		System.out.println("Informe o CPF do titular da conta: ");
+		cpfCliente = sc.nextLine();
+		while (clienteBo.validacaoCpf(cpfCliente) == false) {
+			System.out.println("Insira um valor válido para cpf: ");
+			cpfCliente = sc.nextLine();
+		}
+
+		try {
+			
+			bancoDados.buscarCliente(cpfCliente).equals(null);
+			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));		
+			
+			} catch (Exception e) {
+				opcao = 0;
+			}
 
 		switch (opcao) {
 
 		case 0:
-			System.out.println("Acesso negado, tente novamente!!!");
+			System.out.println("Cliente nao encontrado!!!");
+			System.out.println("Tente Novamente...");
 			opcao = -1;
 			break;
 		case 1:
 			// acessar conta corrente
-			subMenuTransacoesContaCorrente(bancoDados.acessarContaCorrente(clienteTransacao));
+			subMenuTransacoesContaCorrente(bancoDados.acessarContaCorrente(bancoDados.buscarCliente(cpfCliente)));
 			opcao = -1;
 			break;
 		case 2:
 			// acessar conta poupanca
-			subMenuTransacoesContaPoupanca(bancoDados.acessarContaPoupanca(clienteTransacao));
+			subMenuTransacoesContaPoupanca(bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)));
 			opcao = -1;
 			break;
 		default:
@@ -368,7 +399,7 @@ public class MenuPrincipal {
 		double deposito = 0.0;
 		double saque = 0.0;
 		double valorTransferir = 0.0;
-		String clienteTransacao;
+		
 		String chavePix;
 
 		System.out.println("---Transações---");
@@ -413,10 +444,17 @@ public class MenuPrincipal {
 			System.out.println("---Transferência---");
 			System.out.println("Insira um valor para a transferência: ");
 			valorTransferir = sc.nextDouble();
-			System.out.println("Selecione a conta que deseja enviar o valor: ");
-			opcao = selecionarCliente();
-			clienteTransacao = bancoDados.getCliente().get(opcao).getNome();
-			opcao = selecionarConta(clienteTransacao);
+			//System.out.println("Selecione a conta que deseja enviar o valor: ");
+			System.out.println("Informe o CPF da conta de destino: ");
+			cpfCliente = sc.nextLine();
+			while (clienteBo.validacaoCpf(cpfCliente) == false) {
+				System.out.println("Insira um valor válido para cpf: ");
+				cpfCliente = sc.nextLine();
+			}
+						
+			//opcao = selecionarCliente();
+			//clienteTransacao = bancoDados.buscarCliente(cpfCliente).getNome();
+			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));
 
 			switch (opcao) {
 
@@ -427,7 +465,7 @@ public class MenuPrincipal {
 			case 1:
 				// conta corrente ----> conta corrente
 				status = contaBo.transferencia(valorTransferir, contaCorrente,
-						bancoDados.acessarContaCorrente(clienteTransacao), false);
+						bancoDados.acessarContaCorrente(bancoDados.buscarCliente(cpfCliente)), false);
 				if (status == true) {
 					System.out.println("Transferencia realizada com sucesso...");
 
@@ -439,7 +477,7 @@ public class MenuPrincipal {
 			case 2:
 				// conta corrente ----> conta poupanca
 				status = contaBo.transferencia(valorTransferir, contaCorrente,
-						bancoDados.acessarContaPoupanca(clienteTransacao), true);
+						bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)), true);
 				if (status == true) {
 					System.out.println("Transferencia realizada com sucesso...");
 					// taxa transacao corrente --- poupanca
@@ -494,7 +532,6 @@ public class MenuPrincipal {
 		double deposito = 0.0;
 		double saque = 0.0;
 		double valorTransferir = 0.0;
-		String clienteTransacao;
 		String chavePix;
 
 		System.out.println("---Transações---");
@@ -539,10 +576,15 @@ public class MenuPrincipal {
 			System.out.println("---Transferência---");
 			System.out.println("Insira um valor para a transferência: ");
 			valorTransferir = sc.nextDouble();
-			System.out.println("Selecione a conta que deseja enviar o valor: ");
-			opcao = selecionarCliente();
-			clienteTransacao = bancoDados.getCliente().get(opcao).getNome();
-			opcao = selecionarConta(clienteTransacao);
+			//System.out.println("Selecione a conta que deseja enviar o valor: ");
+			System.out.println("Informe o CPF da conta de destino: ");
+			cpfCliente = sc.nextLine();
+			while (clienteBo.validacaoCpf(cpfCliente) == false) {
+				System.out.println("Insira um valor válido para cpf: ");
+				cpfCliente = sc.nextLine();
+			}
+						
+			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));
 
 			switch (opcao) {
 
@@ -552,7 +594,7 @@ public class MenuPrincipal {
 				break;
 			case 1:
 				// conta poupanca ----> conta poupanca
-				status = contaBo.transferencia(valorTransferir, bancoDados.acessarContaPoupanca(clienteTransacao),
+				status = contaBo.transferencia(valorTransferir, bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)),
 						bancoDados.getContaPoupanca().get(opcao), false);
 				if (status == true) {
 					System.out.println("Transferencia realizada com sucesso...");
@@ -564,7 +606,7 @@ public class MenuPrincipal {
 				break;
 			case 2:
 				// conta poupanca ----> conta poupanca
-				status = contaBo.transferencia(valorTransferir, bancoDados.acessarContaPoupanca(clienteTransacao),
+				status = contaBo.transferencia(valorTransferir, bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)),
 						bancoDados.getContaCorrente().get(opcao), true);
 				if (status == true) {
 					System.out.println("Transferencia realizada com sucesso...");
@@ -613,19 +655,15 @@ public class MenuPrincipal {
 
 	}
 
-	public void cadastrarChavePix(int cliente) {
+	public void cadastrarChavePix(Cliente cliente) {
 		boolean status = false;
-		if (bancoDados.getPix().size() == 0) {
-			status = true;
-		} else if (bancoDados.getContaCorrente().get(cliente).getPix().isAtivado() == true) {
-			System.out.println("Chave pix já cadastrada.");
-		} else {
-			status = true;
-		}
 
-		if (status) {
+		ContaCorrente cc = bancoDados.acessarContaCorrente(cliente);
+		status = pixBo.validaPix(cc.getPix());
+		
+		if (!status) {
 			System.out.println("---Cadastrar Chave Pix---");
-			System.out.println("Cliente selecionado: " + bancoDados.getCliente().get(cliente).getNome());
+			System.out.println("Cliente selecionado: " + cliente.getNome());
 			System.out.println("Selecione o tipo de chave Pix a cadastrar:");
 			System.out.println("1- CPF");
 			System.out.println("2- E-mail");
@@ -641,7 +679,7 @@ public class MenuPrincipal {
 				break;
 			case 1:
 				tipoChavePix = tipoChavePix.CPF;
-				conteudoChavePix = bancoDados.getCliente().get(cliente).getCpf();
+				conteudoChavePix = cliente.getCpf();
 				opcao = -1;
 				break;
 			case 2:
@@ -667,7 +705,7 @@ public class MenuPrincipal {
 			}
 
 			bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix, conteudoChavePix));
-			this.pixBo.addPixConta(bancoDados.acessarContaCorrente(bancoDados.getCliente().get(cliente).getNome()),
+			this.pixBo.addPixConta(bancoDados.acessarContaCorrente(cliente),
 					bancoDados.getPix().get(bancoDados.getPix().size() - 1));
 			if (bancoDados.getPix().get(bancoDados.getPix().size() - 1).isAtivado() == true) {
 				System.out.println("Sua chave pix está ativa.");
@@ -676,23 +714,25 @@ public class MenuPrincipal {
 				System.out.println("Chave cadastrada: "
 						+ bancoDados.getPix().get(bancoDados.getPix().size() - 1).getConteudoChave());
 			}
+		} else {
+			System.out.println("Chave Pix já cadastrada!!!");
 		}
 	}
 
-	public int selecionarConta(String cliente) {
+	public int selecionarConta(Cliente cliente) {
 		String opcaoConta;
 		int retorno;
 		System.out.println("---Transações---");
 		System.out.println("Selecione a opcao de conta: ");
-
+		
 		for (ContaCorrente obj : bancoDados.getContaCorrente()) {
-			if (obj.getCliente().getNome().equals(cliente)) {
+			if (obj.getCliente().equals(cliente)) {
 				System.out.println("CC - Conta Corrente");
 			}
 		}
 
 		for (ContaPoupanca obj : bancoDados.getContaPoupanca()) {
-			if (obj.getCliente().getNome().equals(cliente)) {
+			if (obj.getCliente().equals(cliente)) {
 				System.out.println("CP - Conta Poupanca");
 			}
 		}

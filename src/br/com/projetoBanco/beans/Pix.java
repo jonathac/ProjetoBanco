@@ -9,6 +9,15 @@ public class Pix {
 	private String conteudoChave;
 	private boolean isAtivado = false;
 	private Conta conta;
+	private Cliente cliente; 
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
 
 	public String getIdPix() {
 		return idPix;
