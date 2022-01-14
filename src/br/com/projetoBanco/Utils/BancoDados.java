@@ -3,6 +3,7 @@ package br.com.projetoBanco.Utils;
 import java.util.ArrayList;
 
 import br.com.projetoBanco.beans.Cliente;
+import br.com.projetoBanco.beans.Conta;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.Endereco;
@@ -64,4 +65,43 @@ public class BancoDados {
 		this.pix.add(pix);
 
 	}
+
+	public ContaPoupanca acessarContaPoupanca(String clienteTransacao) {
+		ContaPoupanca retorno = null;
+
+		for (ContaPoupanca obj : getContaPoupanca()) {
+			if (obj.getCliente().getNome().equals(clienteTransacao)) {
+				retorno = obj;
+			}
+		}
+
+		return retorno;
+	}
+	
+	public Conta consultarChavePix(String chavePix) {
+
+		Conta conta = null;
+
+		for (ContaCorrente contaCorrente : getContaCorrente()) {
+			if (contaCorrente.getPix().getConteudoChave().equals(chavePix)) {
+				conta = contaCorrente;
+			}
+		}
+
+		return conta;
+	}
+
+	public ContaCorrente acessarContaCorrente(String clienteTransacao) {
+		ContaCorrente retorno = null;
+
+		for (ContaCorrente obj : getContaCorrente()) {
+			if (obj.getCliente().getNome().equals(clienteTransacao)) {
+				retorno = obj;
+			}
+		}
+
+		return retorno;
+	}
+
+	
 }
