@@ -8,6 +8,8 @@ public class Conta {
 	private Cliente cliente;
 	private Pix pix;
 	private Cartao cartao;
+	private CartaoCredito cartaoCredito;
+	private CartaoDebito cartaoDebito;
 
 	public String getIdConta() {
 		return idConta;
@@ -57,5 +59,20 @@ public class Conta {
 		this.cartao = cartao;
 	}
 
-	
+	public CartaoCredito getCartaoCredito() {
+		return cartaoCredito;
+	}
+
+	public void setCartaoCredito(CartaoCredito cartaoCredito) {
+		this.cartaoCredito = cartaoCredito;
+	}
+
+	public CartaoDebito getCartaoDebito() {
+		return cartaoDebito;
+	}
+
+	public void setCartaoDebito(CartaoDebito cartaoDebito) {
+		this.cartaoDebito = cartaoDebito;
+	}
+
 }

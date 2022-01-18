@@ -546,14 +546,19 @@ public class MenuPrincipal {
 			opcao = -1;
 			break;
 		case 6:
+
+			int dia;
+			String vencimentoCartao;
 			String senha = null;
 			int bandeiraCartao;
 			int tipoCartao = 0;
+
 			System.out.println("---Cartões---");
 			System.out.println("1- Solicitar Cartão");
 			System.out.println("2- Acessar cartão de crédito");
 			System.out.println("3- Acessar cartão de débito");
 			System.out.println("4- Informar perda ou roubo");
+			System.out.println("Default - imprimir cartões para teste");
 
 			System.out.println("0- Sair");
 			opcao = sc.nextInt();
@@ -587,26 +592,41 @@ public class MenuPrincipal {
 						senha = sc.next();
 					} while (!cartao.validarSenha(senha));
 
+					if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
+						System.out.println("informe uma dia para vencimento do seu cartao: ");
+						do {
+							System.out.println("Escolher um dia entre 1 a 30.");
+							dia = sc.nextInt();
+						} while (dia < 1 && dia > 30);
+
+						vencimentoCartao = String.valueOf(dia);
+					} else {
+						vencimentoCartao = String.valueOf(0);
+					}
+
 					bancoDados.cadastrarCartao(cartao.cadastrarCartao(contaCorrente, senha,
 							cartao.selecaoBandeira(bandeiraCartao), cartao.selecaoTipo(tipoCartao)));
-					cartao.ativarCartao(contaCorrente.getCartao(), true);
+
+					cartao.dataVencimento(bancoDados.consultarCartao(contaCorrente), vencimentoCartao);
+					cartao.ativarCartao(bancoDados.consultarCartao(contaCorrente), true);
 					System.out.println("Cartão solicitado com sucesso!");
 					System.out.println(
-							"Deseja habilitar função " + cartao.selecaoTipo(tipoCartao) + "do seu cartão? s/n");
+							"Deseja habilitar função " + cartao.selecaoTipo(tipoCartao) + " do seu cartão? s/n");
 					String valida = sc.next().toLowerCase();
 
 					if (valida.equals("s")) {
 						if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
-							cartao.liberarCredito(contaCorrente.getCartao());
+							cartao.liberarCredito(bancoDados.consultarCartao(contaCorrente));
 							System.out.println("Ativação concluida com sucesso.");
 						} else if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.DEBITO)) {
-							cartao.liberarDebito(contaCorrente.getCartao());
+							cartao.liberarDebito(bancoDados.consultarCartao(contaCorrente));
 							System.out.println("Ativação concluida com sucesso.");
 						}
 
 					}
 
-				} else if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
+				} else if (bancoDados.consultarCartao(contaCorrente).isCredito() == true
+						&& bancoDados.consultarCartao(contaCorrente).isDebito() == false) {
 					System.out.println("Voce já tem um cartão de crédito ativo.");
 					System.out.println("Deseja solicitar a função Débito? s/n");
 					String valida = sc.next().toLowerCase();
@@ -614,8 +634,8 @@ public class MenuPrincipal {
 					if (valida.equals("s")) {
 						System.out.println("Informe a senha do cartão atual: ");
 						senha = sc.next();
-						if (contaCorrente.getCartao().getSenha().equals(senha)) {
-							cartao.adicionarDebito(contaCorrente.getCartao());
+						if (bancoDados.consultarCartao(contaCorrente).getSenha().equals(senha)) {
+							cartao.adicionarDebito(bancoDados.consultarCartao(contaCorrente));
 							System.out.println("Função débito habilitada com sucesso!");
 						} else {
 							System.out.println("Senha incorreta, tente novamente");
@@ -626,7 +646,8 @@ public class MenuPrincipal {
 
 				}
 
-				else if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.DEBITO)) {
+				else if (bancoDados.consultarCartao(contaCorrente).isDebito() == true
+						&& bancoDados.consultarCartao(contaCorrente).isCredito() == false) {
 					System.out.println("Voce já tem um cartão de débito ativo.");
 					System.out.println("Deseja solicitar a função Crédito? s/n");
 					String valida = sc.next().toLowerCase();
@@ -634,8 +655,17 @@ public class MenuPrincipal {
 					if (valida.equals("s")) {
 						System.out.println("Informe a senha do cartão atual: ");
 						senha = sc.next();
-						if (contaCorrente.getCartao().getSenha().equals(senha)) {
-							cartao.adicionarCredito(contaCorrente.getCartao());
+						if (bancoDados.consultarCartao(contaCorrente).getSenha().equals(senha)) {
+
+							System.out.println("informe uma dia para vencimento do seu cartao: ");
+							do {
+								System.out.println("Escolher um dia entre 1 a 30.");
+								dia = sc.nextInt();
+							} while (dia < 1 && dia > 30);
+
+							vencimentoCartao = String.valueOf(dia);
+
+							cartao.adicionarCredito(bancoDados.consultarCartao(contaCorrente), vencimentoCartao);
 							System.out.println("Função Crédito habilitada com sucesso!");
 						} else {
 							System.out.println("Senha incorreta, tente novamente");
@@ -645,13 +675,13 @@ public class MenuPrincipal {
 					}
 				}
 
-				else if (contaCorrente.getCartao().isAtivo() == false) {
+				else if (bancoDados.consultarCartao(contaCorrente).isAtivo() == false) {
 					System.out.println("Seu cartão já possui as funções de crédito e débito, e não está ativo");
 					System.out.println("Deseja ativar seu cartão? s/n");
 					String valida = sc.next().toLowerCase();
 
 					if (valida.equals("s")) {
-						cartao.ativarCartao(contaCorrente.getCartao(), true);
+						cartao.ativarCartao(bancoDados.consultarCartao(contaCorrente), true);
 						System.out.println("Ativação concluida com sucesso.");
 					}
 				}
@@ -663,7 +693,7 @@ public class MenuPrincipal {
 
 				break;
 			case 2:
-				Cartao cartao = contaCorrente.getCartao();
+				Cartao cartao = bancoDados.consultarCartao(contaCorrente);
 				if (bancoDados.verificaCartao(contaCorrente) && cartao.isCredito()) {
 
 					for (int i = 0; i < 3 || senha.equals(cartao.getSenha()); i++) {
@@ -766,7 +796,9 @@ public class MenuPrincipal {
 					System.out.println("Cliente: " + obj.getConta().getCliente().getNome());
 					System.out.println("Número Cartao: " + obj.getNumero());
 					System.out.println("Bandeira: " + obj.getBandeiraCartao());
-
+					System.out.println("Vencimento cartao: " + obj.getCartaoCredito().getVencimentoFatura());
+					System.out.println("");
+					//corrigir parse da data, esta imprimindo sem formato
 				}
 
 				System.out.println("Opção inválida, tente novamente!!!");
