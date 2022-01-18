@@ -7,6 +7,7 @@ public class Conta {
 	private double saldo;
 	private Cliente cliente;
 	private Pix pix;
+	private Cartao cartao;
 
 	public String getIdConta() {
 		return idConta;
@@ -46,6 +47,14 @@ public class Conta {
 
 	public void setPix(Pix pix) {
 		this.pix = pix;
+	}
+
+	public Cartao getCartao() {
+		return cartao;
+	}
+
+	public void setCartao(Cartao cartao) {
+		this.cartao = cartao;
 	}
 
 	

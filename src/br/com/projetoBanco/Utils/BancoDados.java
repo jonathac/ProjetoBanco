@@ -2,12 +2,14 @@ package br.com.projetoBanco.Utils;
 
 import java.util.ArrayList;
 
+import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.Conta;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.Endereco;
 import br.com.projetoBanco.beans.Pix;
+import br.com.projetoBanco.beans.TipoCartao;
 
 public class BancoDados {
 
@@ -15,7 +17,8 @@ public class BancoDados {
 	private ArrayList<Endereco> endereco = new ArrayList<>();
 	private ArrayList<ContaCorrente> contaCorrente = new ArrayList<>();
 	private ArrayList<ContaPoupanca> contaPoupanca = new ArrayList<>();
-	private ArrayList<Pix> pix = new ArrayList<Pix>();
+	private ArrayList<Pix> pix = new ArrayList<>();
+	private ArrayList<Cartao> cartao = new ArrayList<>();
 
 	public ArrayList<Cliente> getCliente() {
 		return cliente;
@@ -35,6 +38,10 @@ public class BancoDados {
 
 	public ArrayList<Pix> getPix() {
 		return pix;
+	}
+
+	public ArrayList<Cartao> getCartao() {
+		return cartao;
 	}
 
 	public void cadastroEndereco(Endereco endereco) {
@@ -77,7 +84,7 @@ public class BancoDados {
 
 		return retorno;
 	}
-	
+
 	public Conta consultarChavePix(String chavePix) {
 
 		Conta conta = null;
@@ -103,15 +110,48 @@ public class BancoDados {
 		return retorno;
 	}
 
-	public Cliente buscarCliente (String cpf) {
+	public Cliente buscarCliente(String cpf) {
 		Cliente cliente = null;
-		
+
 		for (Cliente obj : this.cliente) {
 			if (obj.getCpf().equals(cpf)) {
 				cliente = obj;
 			}
 		}
-		
+
 		return cliente;
 	}
+
+	public void cadastrarCartao(Cartao cartao) {
+		this.cartao.add(cartao);
+	}
+
+	public Cartao consultarCartao(Conta conta) {
+		Cartao cartao = new Cartao();
+
+		for (Cartao obj : this.cartao) {
+			if (obj.getConta().equals(conta)) {
+				cartao = obj;
+			}
+		}
+
+		return cartao;
+	}
+
+	public boolean verificaCartao(Conta conta) {
+		boolean retorno = false;
+
+		for (Cartao obj : this.cartao) {
+			if (obj.getConta().equals(conta)) {
+				retorno = true;
+			}
+
+		}
+
+		return retorno;
+	}
+
+
+
+
 }

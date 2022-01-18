@@ -7,11 +7,14 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import br.com.projetoBanco.Utils.BancoDados;
+import br.com.projetoBanco.beans.BandeiraCartao;
+import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
-import br.com.projetoBanco.beans.Pix;
+import br.com.projetoBanco.beans.TipoCartao;
 import br.com.projetoBanco.beans.TipoChavePix;
+import br.com.projetoBanco.bo.CartaoBo;
 import br.com.projetoBanco.bo.ClienteBo;
 import br.com.projetoBanco.bo.ContaBo;
 import br.com.projetoBanco.bo.ContaCorrenteBo;
@@ -45,6 +48,8 @@ public class MenuPrincipal {
 	ContaBo contaBo = new ContaBo();
 	PixBo pixBo = new PixBo();
 	BancoDados bancoDados = new BancoDados();
+	CartaoBo cartao = new CartaoBo();
+	BandeiraCartao bandeira;
 
 	public void menuPrincipal() {
 
@@ -83,8 +88,8 @@ public class MenuPrincipal {
 		while (opcao != 0) {
 			System.out.println("---Menu Principal---");
 			System.out.println("1- Cadastrar Cliente");
-			System.out.println("2- Cadastrar Conta/Pix");
-			System.out.println("3- Transações");
+			System.out.println("2- Cadastrar Conta");
+			System.out.println("3- Acessar Conta");
 			System.out.println("4- Cobrar Taxas/Rendimentos");
 			System.out.println("0- Sair");
 
@@ -162,7 +167,7 @@ public class MenuPrincipal {
 				break;
 
 			case 3:
-				transacoes();
+				acessarConta();
 				break;
 
 			case 4:
@@ -257,26 +262,25 @@ public class MenuPrincipal {
 			System.out.println("Insira um valor válido para cpf: ");
 			cpfCliente = sc.nextLine();
 		}
-		
+
 		boolean status = false;
 
 		try {
-			
-		bancoDados.buscarCliente(cpfCliente).equals(null);
-		
-		System.out.println("---Cadastro de conta---");
-		System.out.println("1- Cadastrar Conta Corrente");
-		System.out.println("2- Cadastrar Conta Poupanca");
-		System.out.println("3- Cadastrar Chave Pix");
-		System.out.println("0- Sair");
-		opcao = sc.nextInt();
-			
+
+			bancoDados.buscarCliente(cpfCliente).equals(null);
+
+			System.out.println("---Cadastro de conta---");
+			System.out.println("1- Cadastrar Conta Corrente");
+			System.out.println("2- Cadastrar Conta Poupanca");
+			System.out.println("0- Sair");
+			opcao = sc.nextInt();
+
 		} catch (Exception e) {
 			System.out.println("Cliente nao encontrado!!!");
 			System.out.println("Tente Novamente...");
 			opcao = 0;
 		}
-		
+
 		switch (opcao) {
 
 		case 0:
@@ -296,7 +300,6 @@ public class MenuPrincipal {
 			} else {
 				bancoDados.getContaCorrente()
 						.add(contaCorrenteBo.cadastrarContaCorrente(bancoDados.buscarCliente(cpfCliente)));
-			//	bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
 			}
 			opcao = -1;
@@ -312,15 +315,11 @@ public class MenuPrincipal {
 			if (status == true) {
 				System.out.println("Conta Poupanca já existente...");
 			} else {
-				bancoDados.getContaPoupanca().add(contaPoupancaBo.cadastrarContaPoupanca((bancoDados.buscarCliente(cpfCliente))));
-			//	bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
+				bancoDados.getContaPoupanca()
+						.add(contaPoupancaBo.cadastrarContaPoupanca((bancoDados.buscarCliente(cpfCliente))));
 				System.out.println("Conta cadastrada com sucesso!!!");
 			}
 
-			opcao = -1;
-			break;
-		case 3:
-			cadastrarChavePix(bancoDados.buscarCliente(cpfCliente));
 			opcao = -1;
 			break;
 		default:
@@ -347,10 +346,9 @@ public class MenuPrincipal {
 		return opcao;
 	}
 
-	public void transacoes() {
+	public void acessarConta() {
 
-		
-		System.out.println("---Transações---");
+		System.out.println("---Acessar Conta---");
 		System.out.println("Informe o CPF do titular da conta: ");
 		cpfCliente = sc.nextLine();
 		while (clienteBo.validacaoCpf(cpfCliente) == false) {
@@ -359,19 +357,18 @@ public class MenuPrincipal {
 		}
 
 		try {
-			
+
 			bancoDados.buscarCliente(cpfCliente).equals(null);
-			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));		
-			
-			} catch (Exception e) {
-				opcao = 0;
-			}
+			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));
+
+		} catch (Exception e) {
+			opcao = 0;
+		}
 
 		switch (opcao) {
 
 		case 0:
-			System.out.println("Cliente nao encontrado!!!");
-			System.out.println("Tente Novamente...");
+			System.out.println("Acesso negado, tente novamente!!!");
 			opcao = -1;
 			break;
 		case 1:
@@ -399,7 +396,7 @@ public class MenuPrincipal {
 		double deposito = 0.0;
 		double saque = 0.0;
 		double valorTransferir = 0.0;
-		
+
 		String chavePix;
 
 		System.out.println("---Transações---");
@@ -408,6 +405,7 @@ public class MenuPrincipal {
 		System.out.println("3- Transferência");
 		System.out.println("4- Pix");
 		System.out.println("5- Saldo");
+		System.out.println("6- Cartões");
 		System.out.println("0- Sair");
 		opcao = sc.nextInt();
 
@@ -444,16 +442,14 @@ public class MenuPrincipal {
 			System.out.println("---Transferência---");
 			System.out.println("Insira um valor para a transferência: ");
 			valorTransferir = sc.nextDouble();
-			//System.out.println("Selecione a conta que deseja enviar o valor: ");
+			// System.out.println("Selecione a conta que deseja enviar o valor: ");
 			System.out.println("Informe o CPF da conta de destino: ");
 			cpfCliente = sc.nextLine();
 			while (clienteBo.validacaoCpf(cpfCliente) == false) {
 				System.out.println("Insira um valor válido para cpf: ");
 				cpfCliente = sc.nextLine();
 			}
-						
-			//opcao = selecionarCliente();
-			//clienteTransacao = bancoDados.buscarCliente(cpfCliente).getNome();
+
 			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));
 
 			switch (opcao) {
@@ -495,19 +491,50 @@ public class MenuPrincipal {
 			}
 			opcao = -1;
 			break;
+
 		case 4:
 			System.out.println("---Pix---");
-			System.out.println("Insira a chave pix da conta a receber: ");
-			chavePix = sc.next();
-			System.out.println("Insira o valor da trasnferencia: ");
-			valorTransferir = sc.nextDouble();
-			status = contaBo.transferencia(valorTransferir, contaCorrente, bancoDados.consultarChavePix(chavePix),
-					false);
+			System.out.println("1- Cadastrar chave Pix");
+			System.out.println("2- Realizar Pix");
+			int opcao = sc.nextInt();
 
-			if (status == true) {
-				System.out.println("Transferencia realizada com sucesso...");
-			} else {
-				System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+			switch (opcao) {
+
+			case 1:
+				cadastrarChavePix(contaCorrente.getCliente());
+				opcao = -1;
+				break;
+			case 2:
+
+				if (pixBo.validaPix(contaCorrente.getPix())) {
+
+					System.out.println("Insira a chave pix da conta a receber: ");
+					chavePix = sc.next();
+					if (pixBo.validaPix(bancoDados.consultarChavePix(chavePix).getPix())) {
+						System.out.println("Insira o valor da trasnferencia: ");
+						valorTransferir = sc.nextDouble();
+						status = contaBo.transferencia(valorTransferir, contaCorrente,
+								bancoDados.consultarChavePix(chavePix), false);
+
+						if (status == true) {
+							System.out.println("Transferencia realizada com sucesso...");
+						} else {
+							System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+						}
+					} else {
+						System.out.println("Chave pix não encontrada.");
+					}
+
+				} else {
+					System.out.println("Chave Pix não ativada.");
+					System.out.println("Realize o ativacao da chave pix e tente novamente");
+				}
+
+				opcao = -1;
+				break;
+			default:
+				System.out.println("Opcao invalida, tente novamente");
+				opcao = -1;
 			}
 
 			opcao = -1;
@@ -515,6 +542,237 @@ public class MenuPrincipal {
 		case 5:
 			System.out.println("---Saldo---");
 			System.out.println(contaBo.exibirSaldo(contaCorrente, contaCorrente.getCliente()));
+
+			opcao = -1;
+			break;
+		case 6:
+			String senha = null;
+			int bandeiraCartao;
+			int tipoCartao = 0;
+			System.out.println("---Cartões---");
+			System.out.println("1- Solicitar Cartão");
+			System.out.println("2- Acessar cartão de crédito");
+			System.out.println("3- Acessar cartão de débito");
+			System.out.println("4- Informar perda ou roubo");
+
+			System.out.println("0- Sair");
+			opcao = sc.nextInt();
+
+			switch (opcao) {
+			case 1:
+
+				if (!bancoDados.verificaCartao(contaCorrente)) {
+
+					System.out.println("Solicitação de Cartão");
+
+					do {
+						System.out.println("Escolha um dos valores abaixo: ");
+						System.out.println("Qual cartao deseja solicitar: ");
+						System.out.println("0- Crédito");
+						System.out.println("1- Débito");
+						tipoCartao = sc.nextInt();
+					} while (tipoCartao < 0 && tipoCartao > 1);
+
+					do {
+						System.out.println("Escolha um dos valores abaixo: ");
+						System.out.println("Qual a bandeira você deseja para seu cartao: ");
+						System.out.println("0- VISA");
+						System.out.println("1- MASTER");
+						System.out.println("2- ELO");
+						bandeiraCartao = sc.nextInt();
+					} while (bandeiraCartao < 0 && bandeiraCartao > 2);
+
+					do {
+						System.out.println("Cadastre senha numerica de 4 digitos");
+						senha = sc.next();
+					} while (!cartao.validarSenha(senha));
+
+					bancoDados.cadastrarCartao(cartao.cadastrarCartao(contaCorrente, senha,
+							cartao.selecaoBandeira(bandeiraCartao), cartao.selecaoTipo(tipoCartao)));
+					cartao.ativarCartao(contaCorrente.getCartao(), true);
+					System.out.println("Cartão solicitado com sucesso!");
+					System.out.println(
+							"Deseja habilitar função " + cartao.selecaoTipo(tipoCartao) + "do seu cartão? s/n");
+					String valida = sc.next().toLowerCase();
+
+					if (valida.equals("s")) {
+						if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
+							cartao.liberarCredito(contaCorrente.getCartao());
+							System.out.println("Ativação concluida com sucesso.");
+						} else if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.DEBITO)) {
+							cartao.liberarDebito(contaCorrente.getCartao());
+							System.out.println("Ativação concluida com sucesso.");
+						}
+
+					}
+
+				} else if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
+					System.out.println("Voce já tem um cartão de crédito ativo.");
+					System.out.println("Deseja solicitar a função Débito? s/n");
+					String valida = sc.next().toLowerCase();
+
+					if (valida.equals("s")) {
+						System.out.println("Informe a senha do cartão atual: ");
+						senha = sc.next();
+						if (contaCorrente.getCartao().getSenha().equals(senha)) {
+							cartao.adicionarDebito(contaCorrente.getCartao());
+							System.out.println("Função débito habilitada com sucesso!");
+						} else {
+							System.out.println("Senha incorreta, tente novamente");
+						}
+					} else {
+						System.out.println("Não foi solicitado nenhum cartão");
+					}
+
+				}
+
+				else if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.DEBITO)) {
+					System.out.println("Voce já tem um cartão de débito ativo.");
+					System.out.println("Deseja solicitar a função Crédito? s/n");
+					String valida = sc.next().toLowerCase();
+
+					if (valida.equals("s")) {
+						System.out.println("Informe a senha do cartão atual: ");
+						senha = sc.next();
+						if (contaCorrente.getCartao().getSenha().equals(senha)) {
+							cartao.adicionarCredito(contaCorrente.getCartao());
+							System.out.println("Função Crédito habilitada com sucesso!");
+						} else {
+							System.out.println("Senha incorreta, tente novamente");
+						}
+					} else {
+						System.out.println("Não foi solicitado nenhum cartão");
+					}
+				}
+
+				else if (contaCorrente.getCartao().isAtivo() == false) {
+					System.out.println("Seu cartão já possui as funções de crédito e débito, e não está ativo");
+					System.out.println("Deseja ativar seu cartão? s/n");
+					String valida = sc.next().toLowerCase();
+
+					if (valida.equals("s")) {
+						cartao.ativarCartao(contaCorrente.getCartao(), true);
+						System.out.println("Ativação concluida com sucesso.");
+					}
+				}
+
+				else {
+					System.out.println("Seu cartão já possui as funções de crédito e débito ativas.");
+
+				}
+
+				break;
+			case 2:
+				Cartao cartao = contaCorrente.getCartao();
+				if (bancoDados.verificaCartao(contaCorrente) && cartao.isCredito()) {
+
+					for (int i = 0; i < 3 || senha.equals(cartao.getSenha()); i++) {
+						if (i != 0) {
+							System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
+						}
+						System.out.println("Informe a senha do seu cartão de crédito");
+						senha = sc.next();
+					}
+					if (senha.equals(cartao.getSenha())) {
+
+						System.out.println("Cartão de crédito");
+						System.out.println("1- Exibir limite");
+						System.out.println("2- Exibir fatura");
+						System.out.println("3- Pagar fatura");
+						System.out.println("4- Alterar data de vencimento");
+						System.out.println("5- Habilitar cartão");
+						System.out.println("6- Bloquear cartão");
+						opcao = sc.nextInt();
+
+						switch (opcao) {
+						case 1:
+							System.out.println("Limite");
+
+							opcao = -1;
+							break;
+						case 2:
+
+							System.out.println("Fatura");
+							opcao = -1;
+							break;
+						case 3:
+
+							System.out.println("Pagar Fatura");
+							opcao = -1;
+							break;
+						case 4:
+
+							System.out.println("Alterar data de vencimento");
+							opcao = -1;
+							break;
+						case 5:
+							System.out.println("Habilitar cartão");
+							if (cartao.isCreditoBloqueado()) {
+								this.cartao.liberarCredito(cartao);
+								System.out.println("Função crédito habilitada com sucesso");
+							} else {
+								System.out.println("A função crédito do seu cartão já está habilitada.");
+							}
+
+							opcao = -1;
+							break;
+						case 6:
+							System.out.println("Bloquear cartão");
+							if (!cartao.isCreditoBloqueado()) {
+								this.cartao.bloquearCredito(cartao);
+								System.out.println("Função crédito bloqueada com sucesso");
+							} else {
+								System.out.println("A função crédito do seu cartão já está bloqueada.");
+							}
+
+							opcao = -1;
+							break;
+
+						default:
+							System.out.println("Opção inválida, tente novamente!!!");
+							opcao = -1;
+							break;
+
+						}
+					} else {
+						System.out.println("Seu cartão não possui a função Crédito.");
+					}
+				}
+				opcao = -1;
+				break;
+			case 3:
+
+				break;
+			case 4:
+				System.out.println("Perda ou Roubo");
+				cartao = contaCorrente.getCartao();
+				if (bancoDados.verificaCartao(contaCorrente)) {
+					for (int i = 0; i < 3 || senha.equals(cartao.getSenha()); i++) {
+						if (i != 0) {
+							System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
+						}
+						System.out.println("Informe a senha do seu cartão de crédito");
+						senha = sc.next();
+					}
+					if (senha.equals(cartao.getSenha())) {
+						this.cartao.ativarCartao(cartao, false);
+					}
+				}
+				opcao = -1;
+				break;
+			default:
+
+				for (Cartao obj : bancoDados.getCartao()) {
+					System.out.println("Cliente: " + obj.getConta().getCliente().getNome());
+					System.out.println("Número Cartao: " + obj.getNumero());
+					System.out.println("Bandeira: " + obj.getBandeiraCartao());
+
+				}
+
+				System.out.println("Opção inválida, tente novamente!!!");
+				opcao = -1;
+				break;
+			}
 
 			opcao = -1;
 			break;
@@ -576,14 +834,14 @@ public class MenuPrincipal {
 			System.out.println("---Transferência---");
 			System.out.println("Insira um valor para a transferência: ");
 			valorTransferir = sc.nextDouble();
-			//System.out.println("Selecione a conta que deseja enviar o valor: ");
+			// System.out.println("Selecione a conta que deseja enviar o valor: ");
 			System.out.println("Informe o CPF da conta de destino: ");
 			cpfCliente = sc.nextLine();
 			while (clienteBo.validacaoCpf(cpfCliente) == false) {
 				System.out.println("Insira um valor válido para cpf: ");
 				cpfCliente = sc.nextLine();
 			}
-						
+
 			opcao = selecionarConta(bancoDados.buscarCliente(cpfCliente));
 
 			switch (opcao) {
@@ -594,7 +852,8 @@ public class MenuPrincipal {
 				break;
 			case 1:
 				// conta poupanca ----> conta poupanca
-				status = contaBo.transferencia(valorTransferir, bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)),
+				status = contaBo.transferencia(valorTransferir,
+						bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)),
 						bancoDados.getContaPoupanca().get(opcao), false);
 				if (status == true) {
 					System.out.println("Transferencia realizada com sucesso...");
@@ -606,7 +865,8 @@ public class MenuPrincipal {
 				break;
 			case 2:
 				// conta poupanca ----> conta poupanca
-				status = contaBo.transferencia(valorTransferir, bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)),
+				status = contaBo.transferencia(valorTransferir,
+						bancoDados.acessarContaPoupanca(bancoDados.buscarCliente(cpfCliente)),
 						bancoDados.getContaCorrente().get(opcao), true);
 				if (status == true) {
 					System.out.println("Transferencia realizada com sucesso...");
@@ -626,18 +886,51 @@ public class MenuPrincipal {
 			opcao = -1;
 			break;
 		case 4:
-			System.out.println("---Pix---");
-			System.out.println("Insira a chave pix da conta a receber: ");
-			chavePix = sc.next();
-			System.out.println("Insira o valor da trasnferencia: ");
-			valorTransferir = sc.nextDouble();
-			status = contaBo.transferencia(valorTransferir, contaPoupanca, bancoDados.consultarChavePix(chavePix),
-					false);
 
-			if (status == true) {
-				System.out.println("Transferencia realizada com sucesso...");
-			} else {
-				System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+			System.out.println("---Pix---");
+			System.out.println("1- Cadastrar chave Pix");
+			System.out.println("2- Realizar Pix");
+			int opcao = sc.nextInt();
+
+			switch (opcao) {
+
+			case 1:
+				cadastrarChavePix(contaPoupanca.getCliente());
+				opcao = -1;
+				break;
+			case 2:
+				if (pixBo.validaPix(contaPoupanca.getPix())) {
+
+					System.out.println("Insira a chave pix da conta a receber: ");
+					chavePix = sc.next();
+					if (pixBo.validaPix(bancoDados.consultarChavePix(chavePix).getPix())) {
+						System.out.println("Insira o valor da trasnferencia: ");
+						valorTransferir = sc.nextDouble();
+						status = contaBo.transferencia(valorTransferir, contaPoupanca,
+								bancoDados.consultarChavePix(chavePix), false);
+
+						if (status == true) {
+							System.out.println("Transferencia realizada com sucesso...");
+						} else {
+							System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+						}
+					} else {
+						System.out.println("Chave pix não encontrada.");
+					}
+
+				} else {
+					System.out.println("Chave Pix não ativada.");
+					System.out.println("Realize o ativacao da chave pix e tente novamente");
+				}
+
+				opcao = -1;
+				break;
+
+			default:
+				System.out.println("Opcao invalida, tente novamente");
+				opcao = -1;
+				break;
+
 			}
 
 			opcao = -1;
@@ -660,7 +953,7 @@ public class MenuPrincipal {
 
 		ContaCorrente cc = bancoDados.acessarContaCorrente(cliente);
 		status = pixBo.validaPix(cc.getPix());
-		
+
 		if (!status) {
 			System.out.println("---Cadastrar Chave Pix---");
 			System.out.println("Cliente selecionado: " + cliente.getNome());
@@ -722,9 +1015,9 @@ public class MenuPrincipal {
 	public int selecionarConta(Cliente cliente) {
 		String opcaoConta;
 		int retorno;
-		System.out.println("---Transações---");
+		System.out.println("---Acessar Conta---");
 		System.out.println("Selecione a opcao de conta: ");
-		
+
 		for (ContaCorrente obj : bancoDados.getContaCorrente()) {
 			if (obj.getCliente().equals(cliente)) {
 				System.out.println("CC - Conta Corrente");
