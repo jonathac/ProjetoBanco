@@ -17,11 +17,11 @@ import br.com.projetoBanco.beans.TipoCartao;
 public class CartaoBo {
 
 	public Cartao cadastrarCartao(Conta conta, String senha, BandeiraCartao bandeiraCartao, TipoCartao tipoCartao) {
-		
+
 		Cartao cartao = new Cartao();
 		CartaoCredito cartaoCredito = new CartaoCredito();
 		CartaoDebito cartaoDebito = new CartaoDebito();
-		
+
 		Random r = new Random();
 		String numeroCartao = "";
 		for (int i = 0; numeroCartao.length() <= 16; i = r.nextInt(9)) {
@@ -36,17 +36,15 @@ public class CartaoBo {
 		cartao.setAtivo(true);
 		cartao.setCartaoCredito(cartaoCredito);
 		cartao.setCartaoDebito(cartaoDebito);
-		
-
+		cartao.getCartaoCredito().setLimite(limiteCartaoCreditoTotal(cartao));
+		cartao.getCartaoCredito().setLimiteDisponivel(cartao.getCartaoCredito().getLimite());
 		if (tipoCartao.equals(TipoCartao.CREDITO)) {
 			cartao.setCredito(true);
 		} else if (tipoCartao.equals(TipoCartao.DEBITO)) {
 			cartao.setDebito(true);
 		}
-		/*if (!vencimentoCartao.equals("0")) {
-		dataVencimento(conta.getCartaoCredito(), vencimentoCartao);
-		}*/
 		
+
 		return cartao;
 	}
 
@@ -105,6 +103,10 @@ public class CartaoBo {
 
 	public void ativarCartao(Cartao cartao, boolean status) {
 		cartao.setAtivo(status);
+		if (!status) {
+		cartao.setCreditoBloqueado(status);
+		cartao.setDebitoBloqueado(status);
+		}
 	}
 
 	public void adicionarCredito(Cartao cartao, String vencimentoCartao) {
@@ -115,26 +117,80 @@ public class CartaoBo {
 	public void adicionarDebito(Cartao cartao) {
 		cartao.setDebito(true);
 	}
-	
-	public void dataVencimento (Cartao cartao, String vencimento) {
-		
+
+	public void dataVencimento(Cartao cartao, String vencimento) {
+
 		Date hoje = new Date();
-		Calendar dataVencimento = Calendar.getInstance();
-		
+		String dataFormatada;
+		Date dataVencimento = null;
+		Calendar cal = Calendar.getInstance();
+
 		SimpleDateFormat ano = new SimpleDateFormat("yyyy");
 		SimpleDateFormat mes = new SimpleDateFormat("MM");
 		SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy");
-		
+
 		vencimento = vencimento.concat("/").concat(mes.format(hoje));
 		vencimento = vencimento.concat("/").concat(ano.format(hoje));
-		
+
 		try {
-			dataVencimento.setTime(data.parse(vencimento));
-			dataVencimento.add(Calendar.MONTH, 1);
+			cal.setTime(data.parse(vencimento));
+			cal.add(Calendar.MONTH, 1);
+			dataFormatada = cal.getTime().toString();
+			dataVencimento = data.parse(dataFormatada);
 		} catch (ParseException e) {
-			
+
 		}
-		cartao.getCartaoCredito().setVencimentoFatura(dataVencimento.getTime());
-		
+
+		cartao.getCartaoCredito().setVencimentoFatura(dataVencimento);
+
 	}
+
+	public void alterarSenha(Cartao cartao, String novaSenha) {
+		cartao.setSenha(novaSenha);
+	}
+
+	
+	public double limiteCartaoCreditoTotal(Cartao cartao) {
+
+		double limite = 0.0;
+
+		limite = cartao.getConta().getSaldo() / 2;
+
+		return limite;
+	}
+
+	public void alterarLimiteCartaoCredito(Cartao cartao) {
+		double limiteTotal = cartao.getCartaoCredito().getLimite();
+		double limiteDisponivel = limiteCartaoCreditoDisponivel(cartao);
+		double limiteUtilizado = limiteTotal-limiteDisponivel;
+		double novoLimiteTotal = limiteCartaoCreditoTotal(cartao);
+		double novoLimiteDisponivel = novoLimiteTotal - limiteUtilizado;
+		
+		cartao.getCartaoCredito().setLimiteDisponivel(novoLimiteDisponivel);
+		cartao.getCartaoCredito().setLimite(novoLimiteTotal);
+	
+	}
+
+	public double limiteCartaoCreditoDisponivel(Cartao cartao) {
+		double limite = cartao.getCartaoCredito().getLimiteDisponivel();
+		return limite;
+	}
+
+	public void atualizarLimiteCartaoDisponivel(CartaoCredito cartaoCredito, Double valorCompra) {
+
+		double limite = cartaoCredito.getLimiteDisponivel();
+		cartaoCredito.setLimiteDisponivel(limite - valorCompra);
+	}
+
+	public boolean autorizarCompra(CartaoCredito cartaoCredito, Double valorCompra) {
+		boolean retorno = false;
+
+		if (cartaoCredito.getLimiteDisponivel() >= valorCompra && !cartaoCredito.isCreditoBloqueado() && cartaoCredito.isAtivo()) {
+			retorno = true;
+			atualizarLimiteCartaoDisponivel(cartaoCredito, valorCompra);
+		}
+
+		return retorno;
+	}
+
 }

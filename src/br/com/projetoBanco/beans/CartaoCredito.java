@@ -7,6 +7,7 @@ import java.util.Date;
 public class CartaoCredito extends Cartao {
 
 	private double limite;
+	private double limiteDisponivel;
 	private double valorFatura;
 	private Date vencimentoFatura;
 
@@ -32,6 +33,14 @@ public class CartaoCredito extends Cartao {
 
 	public void setVencimentoFatura(Date vencimentoFatura) {
 		this.vencimentoFatura = vencimentoFatura;
+	}
+
+	public double getLimiteDisponivel() {
+		return limiteDisponivel;
+	}
+
+	public void setLimiteDisponivel(double limiteDisponivel) {
+		this.limiteDisponivel = limiteDisponivel;
 	}
 
 	public CartaoCredito() {

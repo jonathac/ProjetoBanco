@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.Cliente;
+import br.com.projetoBanco.beans.Compras;
 import br.com.projetoBanco.beans.Conta;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.Endereco;
 import br.com.projetoBanco.beans.Pix;
-import br.com.projetoBanco.beans.TipoCartao;
 
 public class BancoDados {
 
@@ -19,6 +19,7 @@ public class BancoDados {
 	private ArrayList<ContaPoupanca> contaPoupanca = new ArrayList<>();
 	private ArrayList<Pix> pix = new ArrayList<>();
 	private ArrayList<Cartao> cartao = new ArrayList<>();
+	private ArrayList<Compras> compras = new ArrayList<>();
 
 	public ArrayList<Cliente> getCliente() {
 		return cliente;
@@ -138,6 +139,19 @@ public class BancoDados {
 		return cartao;
 	}
 
+	
+	public Cartao consultarCartaoCpf (String cpfCliente) {
+		Cartao cartao = null;
+		
+		for (Cartao obj : this.cartao) {
+			if (obj.getConta().getCliente().getCpf().equals(cpfCliente)) {
+				cartao = obj;
+			}
+		}
+		
+		return cartao;
+	}
+	
 	public boolean verificaCartao(Conta conta) {
 		boolean retorno = false;
 
@@ -151,7 +165,8 @@ public class BancoDados {
 		return retorno;
 	}
 
-
-
+	public void cadastrarCompras(Compras compras) {
+		this.compras.add(compras);
+	}
 
 }
