@@ -110,15 +110,6 @@ public class Cartao {
 	public void setCartaoDebito(CartaoDebito cartaoDebito) {
 		this.cartaoDebito = cartaoDebito;
 	}
-
-	@Override
-	public String toString() {
-		return "Cartao [id=" + id + ", numero=" + numero + ", senha=" + senha + ", ativo=" + ativo + ", bandeiraCartao="
-				+ bandeiraCartao + ", credito=" + credito + ", debito=" + debito + ", conta=" + conta
-				+ ", creditoBloqueado=" + creditoBloqueado + ", debitoBloqueado=" + debitoBloqueado + ", cartaoCredito="
-				+ cartaoCredito + ", cartaoDebito=" + cartaoDebito + "]";
-	}
-
 	
 
 }

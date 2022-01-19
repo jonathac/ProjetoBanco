@@ -1,8 +1,8 @@
 package br.com.projetoBanco.beans;
 
-public class CartaoDebito {
+public class CartaoDebito extends Cartao {
 
-	private double limiteTransacao;
+	private double limiteTransacao = 1000;
 
 	public double getLimiteTransacao() {
 		return limiteTransacao;

@@ -10,6 +10,7 @@ import br.com.projetoBanco.Utils.BancoDados;
 import br.com.projetoBanco.beans.BandeiraCartao;
 import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.Cliente;
+import br.com.projetoBanco.beans.Compras;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.TipoCartao;
@@ -93,6 +94,7 @@ public class MenuPrincipal {
 			System.out.println("2- Cadastrar Conta");
 			System.out.println("3- Acessar Conta");
 			System.out.println("4- Cobrar Taxas/Rendimentos");
+			System.out.println("5- Compras");
 			System.out.println("0- Sair");
 
 			opcao = sc.nextInt();
@@ -182,6 +184,106 @@ public class MenuPrincipal {
 				}
 
 				System.out.println("Taxas aplicadas e rendimentos aplicadas com sucesso!!!");
+				break;
+
+			case 5:
+				while (opcao != -1) {
+					String estabelecimentoCompra;
+					Cartao cartao = null;
+					double valorCompra;
+					String senha = "";
+
+					System.out.println("---COMPRAS---");
+					System.out.println("Insira o nome do estabelecimento onde esta sendo realizado a compra: ");
+					estabelecimentoCompra = sc.nextLine();
+					System.out.println("Insira o valor total da compra: ");
+					valorCompra = sc.nextDouble();
+					sc.nextLine();
+					System.out.println("Insira o número do cartão");
+					System.out.println("Para efeitos de teste estamos pesquisando o numero pelo cpf do cliente");
+
+					cpfCliente = sc.nextLine();
+					while (clienteBo.validacaoCpf(cpfCliente) == false) {
+						System.out.println("Insira um valor válido para cpf: ");
+						cpfCliente = sc.nextLine();
+					}
+
+					try {
+
+						bancoDados.consultarCartaoCpf(cpfCliente).equals(null);
+						cartao = bancoDados.consultarCartaoCpf(cpfCliente);
+
+					} catch (Exception e) {
+						System.out.println("Cartão não encontrado, tente novamente");
+						opcao = -1;
+						break;
+					}
+
+					if (cartao.getCartaoCredito().isAtivo() && cartao.getCartaoDebito().isAtivo()) {
+						do {
+							System.out.println("Escolha a opcao de compra:");
+							System.out.println("1- Crédito");
+							System.out.println("2- Débito");
+							opcao = sc.nextInt();
+							sc.nextLine();
+						} while (opcao != 1 && opcao != 2);
+					} else if (!cartao.isCreditoBloqueado() && cartao.getCartaoCredito().isAtivo()) {
+						opcao = 1;
+					} else if (!cartao.isDebitoBloqueado() && cartao.getCartaoDebito().isAtivo()) {
+						opcao = 2;
+					}
+					switch (opcao) {
+					case 1:
+						System.out.println("Informe a senha do seu cartão de crédito");
+						senha = sc.next();
+						sc.nextLine();
+						if (senha.equals(cartao.getSenha())) {
+							if (this.cartao.autorizarCompraCredito(cartao.getCartaoCredito(), valorCompra)) {
+								bancoDados.cadastrarCompras(compras.cadastrarComprasCredito(estabelecimentoCompra,
+										valorCompra, cartao.getCartaoCredito()));
+								System.out.println("Compra autorizada");
+							} else {
+								System.out.println("Compra não autorizada");
+							}
+						} else {
+							System.out.println("Senha incorreta");
+						}
+						break;
+					case 2:
+						System.out.println("Informe a senha do seu cartão de débito");
+						senha = sc.next();
+						sc.nextLine();
+						if (senha.equals(cartao.getSenha())) {
+
+							// inserir metodo que autoriza compra no cartao de débito
+							/// não funciona, falta metodo para debitar valor da conta referente ao cartao
+							if (this.cartao.autorizarCompraDebito(cartao.getCartaoDebito(), valorCompra)) {
+								bancoDados.cadastrarCompras(compras.cadastrarComprasDebito(estabelecimentoCompra,
+										valorCompra, cartao.getCartaoDebito()));
+								/// debitar valor da compra na conta
+								System.out.println("Compra autorizada");
+							} else {
+								System.out.println("Compra não autorizada");
+							}
+						} else {
+							System.out.println("Senha incorreta");
+						}
+						break;
+					}
+
+					System.out.println("Deseja realizar mais alguma compra? s/n");
+					String valida = sc.next().toLowerCase();
+					sc.nextLine();
+					while (!valida.equals("s") && !valida.equals("n")) {
+						System.out.println("Deseja ativar seu cartão? s/n");
+						valida = sc.next().toLowerCase();
+						sc.nextLine();
+					}
+					if (valida.equals("n")) {
+						opcao = -1;
+					}
+				}
+
 				break;
 
 			default:
@@ -567,11 +669,12 @@ public class MenuPrincipal {
 
 					System.out.println("---Cartões---");
 					System.out.println("1- Solicitar Cartão");// ok
-					System.out.println("2- Acessar cartão de crédito");
+					System.out.println("2- Acessar cartão de crédito");// ok
 					System.out.println("3- Acessar cartão de débito");
 					System.out.println("4- Informar perda ou roubo");// ok
 					System.out.println("5- Alterar senha");// ok
-					System.out.println("6- Fazer compras");
+					// System.out.println("6- Fazer compras");
+					System.out.println("6- Habilitar cartão");
 					System.out.println("Default - imprimir cartões para teste");
 
 					System.out.println("0- Sair");
@@ -581,7 +684,7 @@ public class MenuPrincipal {
 					case 1:
 
 						if (!bancoDados.verificaCartao(contaCorrente)) {
-
+							String valida = "";
 							System.out.println("Solicitação de Cartão");
 
 							do {
@@ -607,6 +710,7 @@ public class MenuPrincipal {
 							} while (!cartao.validarSenha(senha));
 
 							if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
+
 								System.out.println("informe uma dia para vencimento do seu cartao: ");
 								do {
 									System.out.println("Escolher um dia entre 1 a 30.");
@@ -623,14 +727,18 @@ public class MenuPrincipal {
 
 							cartao.dataVencimento(bancoDados.consultarCartao(contaCorrente), vencimentoCartao);
 							cartao.ativarCartao(bancoDados.consultarCartao(contaCorrente), true);
+
+							///////////////////////////////////////////////////////////////////////////
 							System.out.println("Cartão solicitado com sucesso!");
 							System.out.println("Deseja habilitar função " + cartao.selecaoTipo(tipoCartao)
 									+ " do seu cartão? s/n");
-							String valida = sc.next().toLowerCase();
+							valida = sc.next().toLowerCase();
+							/////////////////////////////////////////////////////////
 							while (!valida.equals("s") && !valida.equals("n")) {
 								System.out.println("Deseja ativar seu cartão? s/n");
 								valida = sc.next().toLowerCase();
 							}
+
 							if (valida.equals("s")) {
 								if (cartao.selecaoTipo(tipoCartao).equals(TipoCartao.CREDITO)) {
 									cartao.liberarCredito(bancoDados.consultarCartao(contaCorrente));
@@ -648,7 +756,7 @@ public class MenuPrincipal {
 							System.out.println("Deseja solicitar a função Débito? s/n");
 							String valida = sc.next().toLowerCase();
 							while (!valida.equals("s") && !valida.equals("n")) {
-								System.out.println("Deseja ativar seu cartão? s/n");
+								System.out.println("Deseja solicitar a função Débito? s/n");
 								valida = sc.next().toLowerCase();
 							}
 							if (valida.equals("s")) {
@@ -656,7 +764,19 @@ public class MenuPrincipal {
 								senha = sc.next();
 								if (bancoDados.consultarCartao(contaCorrente).getSenha().equals(senha)) {
 									cartao.adicionarDebito(bancoDados.consultarCartao(contaCorrente));
-									System.out.println("Função débito habilitada com sucesso!");
+
+									System.out.println("Função débito solicitada com sucesso!");
+
+									System.out.println("Deseja ativar a função Débito? s/n");
+									valida = sc.next().toLowerCase();
+									while (!valida.equals("s") && !valida.equals("n")) {
+										System.out.println("Deseja ativar a função Débito? s/n");
+										valida = sc.next().toLowerCase();
+									}
+									if (valida.equals("s")) {
+										cartao.liberarDebito(bancoDados.consultarCartao(contaCorrente));
+										System.out.println("Ativação concluida com sucesso.");
+									}
 								} else {
 									System.out.println("Senha incorreta, tente novamente");
 								}
@@ -672,7 +792,7 @@ public class MenuPrincipal {
 							System.out.println("Deseja solicitar a função Crédito? s/n");
 							String valida = sc.next().toLowerCase();
 							while (!valida.equals("s") && !valida.equals("n")) {
-								System.out.println("Deseja ativar seu cartão? s/n");
+								System.out.println("Deseja solicitar a função Crédito? s/n");
 								valida = sc.next().toLowerCase();
 							}
 							if (valida.equals("s")) {
@@ -691,6 +811,18 @@ public class MenuPrincipal {
 									cartao.adicionarCredito(bancoDados.consultarCartao(contaCorrente),
 											vencimentoCartao);
 									System.out.println("Função Crédito habilitada com sucesso!");
+
+									System.out.println("Deseja ativar a função Crédito? s/n");
+									valida = sc.next().toLowerCase();
+									while (!valida.equals("s") && !valida.equals("n")) {
+										System.out.println("Deseja ativar a função Crédito? s/n");
+										valida = sc.next().toLowerCase();
+									}
+									if (valida.equals("s")) {
+										cartao.liberarCredito(bancoDados.consultarCartao(contaCorrente));
+										System.out.println("Ativação concluida com sucesso.");
+									}
+
 								} else {
 									System.out.println("Senha incorreta, tente novamente");
 								}
@@ -733,11 +865,12 @@ public class MenuPrincipal {
 									senha = sc.next();
 								}
 								if (senha.equals(cartao.getSenha())) {
-
+									double valorFatura = 0.0;
+									String valida = "";
 									System.out.println("Cartão de crédito");
 									System.out.println("1- Exibir limite");// ok
-									System.out.println("2- Exibir fatura");
-									System.out.println("3- Pagar fatura");
+									System.out.println("2- Exibir fatura");// //ok
+									System.out.println("3- Pagar fatura");// ok
 									System.out.println("4- Alterar data de vencimento");// ok
 									System.out.println("5- Habilitar cartão");// ok
 									System.out.println("6- Bloquear cartão");// ok
@@ -752,18 +885,57 @@ public class MenuPrincipal {
 									case 1:
 										System.out.println("Limite");
 										System.out.println("O limite total do seu cartão é de: R$ "
-												+ this.cartao.limiteCartaoCreditoTotal(cartao));
+												+ cartao.getCartaoCredito().getLimite());
 										System.out.println("O seu limite disponivel para compras é de: R$ "
-												+ this.cartao.limiteCartaoCreditoDisponivel(cartao));
+												+ cartao.getCartaoCredito().getLimiteDisponivel());
 										// opcao = -1;
 										break;
 									case 2:
 										System.out.println("Fatura");
+										System.out.println("Data     -     Estabelecimento     -     Valor");
+										valorFatura = 0.0;
+										for (Compras obj : bancoDados.getCompras()) {
 
+											if (obj.getCartaoCredito().equals(cartao.getCartaoCredito())) {
+												SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+												String data = sdf.format(obj.getDataCompra());
+												System.out.println(data + " - " + obj.getEstabelecimentoCompra() + " - "
+														+ obj.getValorCompra());
+												valorFatura += obj.getValorCompra();
+											}
+										}
+										System.out.println("Sua fatura tem o valor total de R$ " + valorFatura);
 										// opcao = -1;
 										break;
 									case 3:
 										System.out.println("Pagar Fatura");
+										valorFatura = 0.0;
+										for (Compras obj : bancoDados.getCompras()) {
+											if (obj.getCartaoCredito().equals(cartao.getCartaoCredito())) {
+												valorFatura += obj.getValorCompra();
+											}
+										}
+										System.out.println("Sua fatura tem um valor total de: R$ " + valorFatura);
+										///
+										System.out.println(
+												"Deseja pagar fatura do seu cartão com o saldo da sua conta? s/n");
+										valida = sc.next().toLowerCase();
+										while (!valida.equals("s") && !valida.equals("n")) {
+											System.out.println(
+													"Deseja pagar fatura do seu cartão com o saldo da sua conta? s/n");
+											valida = sc.next().toLowerCase();
+										}
+										if (valida.equals("s")) {
+											if (this.cartao.pagarFatura(contaCorrente, cartao.getCartaoCredito())) {
+												System.out.println("Pagamento efetuado com Sucesso.");
+												bancoDados.pagarFatura(cartao);
+											} else {
+												System.out.println("Saldo insuficiente.");
+												System.out.println("O pagamento não foi efetuado.");
+											}
+										} else {
+											System.out.println("O pagamento não foi efetuado.");
+										}
 
 										// opcao = -1;
 										break;
@@ -777,13 +949,12 @@ public class MenuPrincipal {
 
 										vencimentoCartao = String.valueOf(dia);
 										this.cartao.dataVencimento(cartao, vencimentoCartao);
-										
+
 										SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 										String data = sdf.format(cartao.getCartaoCredito().getVencimentoFatura());
-										
+
 										System.out.println("Sua data de vencimento foi alterada.");
-										System.out.println("Sua próxima fatura esta previsto para "
-												+ data);
+										System.out.println("Sua próxima fatura esta previsto para " + data);
 
 										// opcao = -1;
 										break;
@@ -817,7 +988,7 @@ public class MenuPrincipal {
 													+ this.cartao.limiteCartaoCreditoTotal(cartao));
 
 											System.out.println("Deseja alterar o limite do seu cartão? s/n");
-											String valida = sc.next().toLowerCase();
+											valida = sc.next().toLowerCase();
 											while (!valida.equals("s") && !valida.equals("n")) {
 												System.out.println("Deseja ativar seu cartão? s/n");
 												valida = sc.next().toLowerCase();
@@ -836,9 +1007,13 @@ public class MenuPrincipal {
 
 									}
 								} else {
-									System.out.println("Seu cartão não possui a função Crédito.");
+									System.out.println("Senha incorreta.");
 								}
+							} else {
+								System.out.println("Seu cartão não possui a função Crédito.");
+								opcao = -1;
 							}
+
 						}
 						opcao = 0;
 						break;
@@ -863,12 +1038,14 @@ public class MenuPrincipal {
 							} else {
 								System.out.println("Senha incorreta");
 							}
+						} else {
+							System.out.println("Não foi encontrado nenhum cartão.");
 						}
 						// opcao = -1;
 						break;
 					case 5:
 						System.out.println("Alterar senha");
-						cartao = contaCorrente.getCartao();
+						cartao = bancoDados.consultarCartao(contaCorrente);
 
 						if (bancoDados.verificaCartao(contaCorrente)) {
 							senha = "";
@@ -892,72 +1069,29 @@ public class MenuPrincipal {
 							}
 						}
 						break;
+
 					case 6:
-						while (opcao != -1) {
-							String estabelecimentoCompra;
-							double valorCompra;
+						System.out.println("Habilitar cartão");
+						cartao = bancoDados.consultarCartao(contaCorrente);
 
-							System.out.println("---COMPRAS---");
-							System.out.println("Insira o nome do estabelecimento onde esta sendo realizado a compra: ");
-							sc.nextLine();
-							estabelecimentoCompra = sc.nextLine();
-							System.out.println("Insira o valor total da compra: ");
-							valorCompra = sc.nextDouble();
-							System.out.println("Insira o número do cartão");
-							System.out
-									.println("Para efeitos de teste estamos pesquisando o numero pelo cpf do cliente");
-
-							cpfCliente = sc.nextLine();
-							while (clienteBo.validacaoCpf(cpfCliente) == false) {
-								System.out.println("Insira um valor válido para cpf: ");
-								cpfCliente = sc.nextLine();
-							}
-
-							try {
-
-								bancoDados.consultarCartaoCpf(cpfCliente).equals(null);
-								cartao = bancoDados.consultarCartaoCpf(cpfCliente);
-
-							} catch (Exception e) {
-								System.out.println("Cartão não encontrado, tente novamente");
-								opcao = -1;
-								break;
-							}
-
-							// solicitar opcao debito ou credito
-
-							// compras no credito
-							System.out.println("Informe a senha do seu cartão de crédito");
-							senha = sc.next();
-							if (senha.equals(cartao.getSenha())) {
-								// if (cartao.isAtivo() && cartao.getCartaoCredito().isCreditoBloqueado() ==
-								// false
-								// && this.cartao.autorizarCompra(cartao.getCartaoCredito(), valorCompra)) {
-								if (this.cartao.autorizarCompra(cartao.getCartaoCredito(), valorCompra)) {
-									bancoDados.cadastrarCompras(compras.cadastrarCompras(estabelecimentoCompra,
-											valorCompra, cartao.getCartaoCredito()));
-									System.out.println("Compra autorizada");
-								} else {
-									System.out.println("Compra não autorizada");
+						if (bancoDados.verificaCartao(contaCorrente)) {
+							for (int i = 0; i < 3 && !senha.equals(cartao.getSenha()); i++) {
+								if (i != 0) {
+									System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
 								}
+								System.out.println("Informe a senha do seu cartão");
+								senha = sc.next();
+							}
+							if (senha.equals(cartao.getSenha())) {
+								this.cartao.ativarCartao(cartao, true);
+								System.out.println("Cartão habilitado com sucesso.");
 							} else {
 								System.out.println("Senha incorreta");
-								opcao = -1;
-								break;
 							}
-
-							System.out.println("Deseja realizar mais alguma compra? s/n");
-							String valida = sc.next().toLowerCase();
-							while (!valida.equals("s") && !valida.equals("n")) {
-								System.out.println("Deseja ativar seu cartão? s/n");
-								valida = sc.next().toLowerCase();
-							}
-							if (valida.equals("n")) {
-								opcao = -1;
-							}
-
+						} else {
+							System.out.println("Não foi encontrado nenhum cartão.");
 						}
-						opcao = 0;
+						// opcao = -1;
 						break;
 					default:
 
@@ -965,11 +1099,11 @@ public class MenuPrincipal {
 							System.out.println("Cliente: " + obj.getConta().getCliente().getNome());
 							System.out.println("Número Cartao: " + obj.getNumero());
 							System.out.println("Bandeira: " + obj.getBandeiraCartao());
-							
+
 							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 							String data = sdf.format(obj.getCartaoCredito().getVencimentoFatura());
 							System.out.println("Vencimento cartao: " + data);
-							
+
 							System.out.println("");
 							// corrigir parse da data, esta imprimindo sem formato
 						}
@@ -1157,15 +1291,163 @@ public class MenuPrincipal {
 
 			case 6:
 				// CONSTRUIR
-				break;
-			default:
-				System.out.println("Opção inválida, tente novamente!!!");
-				opcao = -1;
-				break;
-			}
-			opcao = -1;
-		}
+				while (opcao != -1) {
 
+					int dia;
+					String vencimentoCartao;
+					String senha = "";
+					int bandeiraCartao;
+					Cartao cartao = new Cartao();
+
+					System.out.println("---Cartões---");
+					System.out.println("1- Solicitar Cartão");
+					System.out.println("3- Acessar cartão de débito");
+					System.out.println("4- Informar perda ou roubo");
+					System.out.println("5- Alterar senha");
+					System.out.println("6- Habilitar cartão");
+					System.out.println("Default - imprimir cartões para teste");
+
+					System.out.println("0- Sair");
+					opcao = sc.nextInt();
+
+					switch (opcao) {
+					case 1:
+
+						if (!bancoDados.verificaCartao(contaPoupanca)) {
+							String valida = "";
+							System.out.println("Solicitação de Cartão");
+
+							do {
+								System.out.println("Escolha um dos valores abaixo: ");
+								System.out.println("Qual a bandeira você deseja para seu cartao: ");
+								System.out.println("0- VISA");
+								System.out.println("1- MASTER");
+								System.out.println("2- ELO");
+								bandeiraCartao = sc.nextInt();
+							} while (bandeiraCartao < 0 && bandeiraCartao > 2);
+
+							do {
+								System.out.println("Cadastre senha numerica de 4 digitos");
+								senha = sc.next();
+							} while (!this.cartao.validarSenha(senha));
+
+							vencimentoCartao = String.valueOf(0);
+
+							bancoDados.cadastrarCartao(this.cartao.cadastrarCartao(contaPoupanca, senha,
+									this.cartao.selecaoBandeira(bandeiraCartao), TipoCartao.DEBITO));
+
+							this.cartao.dataVencimento(bancoDados.consultarCartao(contaPoupanca), vencimentoCartao);
+							this.cartao.ativarCartao(bancoDados.consultarCartao(contaPoupanca), true);
+
+							///////////////////////////////////////////////////////////////////////////
+							System.out.println("Cartão solicitado com sucesso!");
+							System.out.println("Deseja habilitar função " + TipoCartao.DEBITO + " do seu cartão? s/n");
+							valida = sc.next().toLowerCase();
+							/////////////////////////////////////////////////////////
+							while (!valida.equals("s") && !valida.equals("n")) {
+								System.out.println("Deseja ativar seu cartão? s/n");
+								valida = sc.next().toLowerCase();
+							}
+
+							if (valida.equals("s")) {
+
+								this.cartao.liberarDebito(bancoDados.consultarCartao(contaPoupanca));
+								System.out.println("Ativação concluida com sucesso.");
+
+							}
+
+						} else {
+							System.out.println("Cartão de débito já ativo");
+						}
+
+						break;
+
+					case 3:
+//construir
+						break;
+					case 4:
+						System.out.println("Perda ou Roubo");
+						cartao = bancoDados.consultarCartao(contaPoupanca);
+						if (bancoDados.verificaCartao(contaPoupanca)) {
+							for (int i = 0; i < 3 && !senha.equals(cartao.getSenha()); i++) {
+								if (i != 0) {
+									System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
+								}
+								System.out.println("Informe a senha do seu cartão de crédito");
+								senha = sc.next();
+							}
+							if (senha.equals(cartao.getSenha())) {
+								this.cartao.ativarCartao(cartao, false);
+								System.out.println("Cartão bloqueado com sucesso.");
+							} else {
+								System.out.println("Senha incorreta");
+							}
+						} else {
+							System.out.println("Não foi encontrado nenhum cartão.");
+						}
+						// opcao = -1;
+						break;
+					case 5:
+						System.out.println("Alterar senha");
+						cartao = bancoDados.consultarCartao(contaPoupanca);
+
+						if (bancoDados.verificaCartao(contaPoupanca)) {
+							senha = "";
+							for (int i = 0; i < 3 && !senha.equals(cartao.getSenha()); i++) {
+								if (i != 0) {
+									System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
+								}
+								System.out.println("Informe a senha do seu cartão de crédito");
+								senha = sc.next();
+							}
+							if (senha.equals(cartao.getSenha())) {
+
+								do {
+									System.out.println("Cadastre senha numerica de 4 digitos");
+									senha = sc.next();
+								} while (!this.cartao.validarSenha(senha));
+								this.cartao.alterarSenha(cartao, senha);
+								System.out.println("Senha alterada com sucesso");
+							} else {
+								System.out.println("Senha incorreta");
+							}
+						}
+						break;
+
+					case 6:
+						System.out.println("Habilitar cartão");
+						cartao = bancoDados.consultarCartao(contaPoupanca);
+
+						if (bancoDados.verificaCartao(contaPoupanca)) {
+							for (int i = 0; i < 3 && !senha.equals(cartao.getSenha()); i++) {
+								if (i != 0) {
+									System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
+								}
+								System.out.println("Informe a senha do seu cartão");
+								senha = sc.next();
+							}
+							if (senha.equals(cartao.getSenha())) {
+								this.cartao.ativarCartao(cartao, true);
+								System.out.println("Cartão habilitado com sucesso.");
+							} else {
+								System.out.println("Senha incorreta");
+							}
+						} else {
+							System.out.println("Não foi encontrado nenhum cartão.");
+						}
+						// opcao = -1;
+						break;
+
+					default:
+						System.out.println("Opção inválida, tente novamente!!!");
+						 opcao = -1;
+						break;
+					}
+					//opcao = -1;
+				}
+opcao = 0;
+			}
+		}
 	}
 
 	public void cadastrarChavePix(Cliente cliente) {

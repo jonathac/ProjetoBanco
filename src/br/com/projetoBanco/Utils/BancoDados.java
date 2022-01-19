@@ -45,6 +45,10 @@ public class BancoDados {
 		return cartao;
 	}
 
+	public ArrayList<Compras> getCompras() {
+		return compras;
+	}
+
 	public void cadastroEndereco(Endereco endereco) {
 
 		this.endereco.add(endereco);
@@ -139,19 +143,18 @@ public class BancoDados {
 		return cartao;
 	}
 
-	
-	public Cartao consultarCartaoCpf (String cpfCliente) {
+	public Cartao consultarCartaoCpf(String cpfCliente) {
 		Cartao cartao = null;
-		
+
 		for (Cartao obj : this.cartao) {
 			if (obj.getConta().getCliente().getCpf().equals(cpfCliente)) {
 				cartao = obj;
 			}
 		}
-		
+
 		return cartao;
 	}
-	
+
 	public boolean verificaCartao(Conta conta) {
 		boolean retorno = false;
 
@@ -169,4 +172,13 @@ public class BancoDados {
 		this.compras.add(compras);
 	}
 
+	public void removerCartao(Cartao cartao) {
+		this.cartao.remove(cartao);
+	}
+
+	public void pagarFatura(Cartao cartao) {
+
+		compras.removeIf(compras -> compras.getCartaoCredito().equals(cartao.getCartaoCredito()));
+
+	}
 }

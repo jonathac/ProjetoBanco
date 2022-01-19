@@ -1,6 +1,5 @@
 package br.com.projetoBanco.bo;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -8,11 +7,14 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
+import br.com.projetoBanco.Utils.BancoDados;
 import br.com.projetoBanco.beans.BandeiraCartao;
 import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.CartaoCredito;
 import br.com.projetoBanco.beans.CartaoDebito;
 import br.com.projetoBanco.beans.Conta;
+import br.com.projetoBanco.beans.ContaCorrente;
+import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.TipoCartao;
 
 public class CartaoBo {
@@ -44,7 +46,6 @@ public class CartaoBo {
 		} else if (tipoCartao.equals(TipoCartao.DEBITO)) {
 			cartao.setDebito(true);
 		}
-		
 
 		return cartao;
 	}
@@ -88,30 +89,37 @@ public class CartaoBo {
 
 	public void bloquearCredito(Cartao cartao) {
 		cartao.setCreditoBloqueado(true);
+		cartao.getCartaoCredito().setAtivo(false);
 	}
 
 	public void liberarCredito(Cartao cartao) {
 		cartao.setCreditoBloqueado(false);
+		cartao.getCartaoCredito().setAtivo(true);
 	}
 
 	public void bloquearDebito(Cartao cartao) {
 		cartao.setDebitoBloqueado(true);
+		cartao.getCartaoDebito().setAtivo(false);
 	}
 
 	public void liberarDebito(Cartao cartao) {
 		cartao.setDebitoBloqueado(false);
+		cartao.getCartaoDebito().setAtivo(true);
 	}
 
 	public void ativarCartao(Cartao cartao, boolean status) {
 		cartao.setAtivo(status);
-		if (!status) {
-		cartao.setCreditoBloqueado(status);
-		cartao.setDebitoBloqueado(status);
-		}
+		/*if (!status) {
+			//cartao.setCreditoBloqueado(status);
+			cartao.getCartaoCredito().setAtivo(status);
+			//cartao.setDebitoBloqueado(status);
+			cartao.getCartaoDebito().setAtivo(status);
+		}*/
 	}
 
 	public void adicionarCredito(Cartao cartao, String vencimentoCartao) {
 		cartao.setCredito(true);
+		cartao.getCartaoCredito().setAtivo(true);
 		dataVencimento(cartao, vencimentoCartao);
 	}
 
@@ -127,7 +135,7 @@ public class CartaoBo {
 		SimpleDateFormat ano = new SimpleDateFormat("yyyy");
 		SimpleDateFormat mes = new SimpleDateFormat("MM");
 		SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy");
-		
+
 		vencimento = vencimento.concat("/").concat(mes.format(hoje));
 		vencimento = vencimento.concat("/").concat(ano.format(hoje));
 
@@ -137,7 +145,7 @@ public class CartaoBo {
 		} catch (ParseException e) {
 			System.out.println("erro na data");
 		}
-		
+
 		cartao.getCartaoCredito().setVencimentoFatura(cal.getTime());
 
 	}
@@ -146,7 +154,6 @@ public class CartaoBo {
 		cartao.setSenha(novaSenha);
 	}
 
-	
 	public double limiteCartaoCreditoTotal(Cartao cartao) {
 
 		double limite = 0.0;
@@ -159,13 +166,13 @@ public class CartaoBo {
 	public void alterarLimiteCartaoCredito(Cartao cartao) {
 		double limiteTotal = cartao.getCartaoCredito().getLimite();
 		double limiteDisponivel = limiteCartaoCreditoDisponivel(cartao);
-		double limiteUtilizado = limiteTotal-limiteDisponivel;
+		double limiteUtilizado = limiteTotal - limiteDisponivel;
 		double novoLimiteTotal = limiteCartaoCreditoTotal(cartao);
 		double novoLimiteDisponivel = novoLimiteTotal - limiteUtilizado;
-		
+
 		cartao.getCartaoCredito().setLimiteDisponivel(novoLimiteDisponivel);
 		cartao.getCartaoCredito().setLimite(novoLimiteTotal);
-	
+
 	}
 
 	public double limiteCartaoCreditoDisponivel(Cartao cartao) {
@@ -179,10 +186,11 @@ public class CartaoBo {
 		cartaoCredito.setLimiteDisponivel(limite - valorCompra);
 	}
 
-	public boolean autorizarCompra(CartaoCredito cartaoCredito, Double valorCompra) {
+	public boolean autorizarCompraCredito(CartaoCredito cartaoCredito, Double valorCompra) {
 		boolean retorno = false;
 
-		if (cartaoCredito.getLimiteDisponivel() >= valorCompra && !cartaoCredito.isCreditoBloqueado() && cartaoCredito.isAtivo()) {
+		if (cartaoCredito.getLimiteDisponivel() >= valorCompra && !cartaoCredito.isCreditoBloqueado()
+				&& cartaoCredito.isAtivo()) {
 			retorno = true;
 			atualizarLimiteCartaoDisponivel(cartaoCredito, valorCompra);
 		}
@@ -190,4 +198,47 @@ public class CartaoBo {
 		return retorno;
 	}
 
+	public boolean autorizarCompraDebito(CartaoDebito cartaoDebito, Double valorCompra) {
+		boolean retorno = false;
+	
+		double saldo = 0.0;
+		
+		//NÃO FUNCIONAAAAAAAAAAAAAAAAA
+		
+		System.out.println("Saldo em conta: " + saldo);
+		System.out.println("limite de transacao disponivel " + (cartaoDebito.getLimiteTransacao() >= valorCompra));
+		System.out.println("Cartao bloqueado: " + !cartaoDebito.isDebitoBloqueado());
+		System.out.println("Cartão de debito ativo: " + cartaoDebito.isAtivo());
+		System.out.println("saldo em conta maior que compra " + (saldo >= valorCompra));
+
+		
+		if (cartaoDebito.getLimiteTransacao() >= valorCompra && !cartaoDebito.isDebitoBloqueado()
+				&& saldo >= valorCompra && cartaoDebito.isAtivo()) {
+			
+			//inserir atualização da conta
+			retorno = true;
+		}
+
+		return retorno;
+	}
+	
+	public void atualizarSaldoContaCorrente (ContaCorrente contaCorrente, double valorCompra) {
+		double saldo = contaCorrente.getSaldo();
+		contaCorrente.setSaldo(saldo-valorCompra);
+	}
+	
+	public boolean pagarFatura (ContaCorrente contaCorrente, CartaoCredito cartaoCredito) {
+		boolean retorno = false;
+		double valorFatura = cartaoCredito.getLimite() - cartaoCredito.getLimiteDisponivel();
+		double saldo = contaCorrente.getSaldo();
+		if (saldo >= valorFatura) {
+			retorno = true;
+			contaCorrente.setSaldo(saldo - valorFatura);
+			cartaoCredito.setLimiteDisponivel(cartaoCredito.getLimite());
+			
+		}
+		
+		return retorno;
+	}
+	
 }
