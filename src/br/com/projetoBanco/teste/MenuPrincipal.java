@@ -777,10 +777,13 @@ public class MenuPrincipal {
 
 										vencimentoCartao = String.valueOf(dia);
 										this.cartao.dataVencimento(cartao, vencimentoCartao);
-
+										
+										SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+										String data = sdf.format(cartao.getCartaoCredito().getVencimentoFatura());
+										
 										System.out.println("Sua data de vencimento foi alterada.");
 										System.out.println("Sua próxima fatura esta previsto para "
-												+ cartao.getCartaoCredito().getVencimentoFatura());
+												+ data);
 
 										// opcao = -1;
 										break;
@@ -844,11 +847,9 @@ public class MenuPrincipal {
 						break;
 					case 4:
 						System.out.println("Perda ou Roubo");
-						cartao = contaCorrente.getCartao();
+						cartao = bancoDados.consultarCartao(contaCorrente);
 
 						if (bancoDados.verificaCartao(contaCorrente)) {
-							senha = "";//talvez apagar essa linha
-							//erro de ponteiro null
 							for (int i = 0; i < 3 && !senha.equals(cartao.getSenha()); i++) {
 								if (i != 0) {
 									System.out.println("Senha incorreta, tente novamente " + (i + 1) + "/3");
@@ -858,6 +859,7 @@ public class MenuPrincipal {
 							}
 							if (senha.equals(cartao.getSenha())) {
 								this.cartao.ativarCartao(cartao, false);
+								System.out.println("Cartão bloqueado com sucesso.");
 							} else {
 								System.out.println("Senha incorreta");
 							}
@@ -963,7 +965,11 @@ public class MenuPrincipal {
 							System.out.println("Cliente: " + obj.getConta().getCliente().getNome());
 							System.out.println("Número Cartao: " + obj.getNumero());
 							System.out.println("Bandeira: " + obj.getBandeiraCartao());
-							System.out.println("Vencimento cartao: " + obj.getCartaoCredito().getVencimentoFatura());
+							
+							SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+							String data = sdf.format(obj.getCartaoCredito().getVencimentoFatura());
+							System.out.println("Vencimento cartao: " + data);
+							
 							System.out.println("");
 							// corrigir parse da data, esta imprimindo sem formato
 						}

@@ -1,5 +1,6 @@
 package br.com.projetoBanco.bo;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -121,27 +122,23 @@ public class CartaoBo {
 	public void dataVencimento(Cartao cartao, String vencimento) {
 
 		Date hoje = new Date();
-		String dataFormatada;
-		Date dataVencimento = null;
 		Calendar cal = Calendar.getInstance();
 
 		SimpleDateFormat ano = new SimpleDateFormat("yyyy");
 		SimpleDateFormat mes = new SimpleDateFormat("MM");
 		SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy");
-
+		
 		vencimento = vencimento.concat("/").concat(mes.format(hoje));
 		vencimento = vencimento.concat("/").concat(ano.format(hoje));
 
 		try {
 			cal.setTime(data.parse(vencimento));
 			cal.add(Calendar.MONTH, 1);
-			dataFormatada = cal.getTime().toString();
-			dataVencimento = data.parse(dataFormatada);
 		} catch (ParseException e) {
-
+			System.out.println("erro na data");
 		}
-
-		cartao.getCartaoCredito().setVencimentoFatura(dataVencimento);
+		
+		cartao.getCartaoCredito().setVencimentoFatura(cal.getTime());
 
 	}
 
