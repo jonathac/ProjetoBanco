@@ -10,6 +10,7 @@ public class CartaoCredito extends Cartao {
 	private double limiteDisponivel;
 	private double valorFatura;
 	private Date vencimentoFatura;
+	private Apolice apolice;
 
 	public double getLimite() {
 		return limite;
@@ -52,6 +53,14 @@ public class CartaoCredito extends Cartao {
 		} catch (ParseException e) {
 		}
 
+	}
+
+	public Apolice getApolice() {
+		return apolice;
+	}
+
+	public void setApolice(Apolice apolice) {
+		this.apolice = apolice;
 	}
 
 }

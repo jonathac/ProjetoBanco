@@ -41,6 +41,8 @@ public class CartaoBo {
 		cartao.setCartaoDebito(cartaoDebito);
 		cartao.getCartaoCredito().setLimite(limiteCartaoCreditoTotal(cartao));
 		cartao.getCartaoCredito().setLimiteDisponivel(cartao.getCartaoCredito().getLimite());
+		
+		
 		if (tipoCartao.equals(TipoCartao.CREDITO)) {
 			cartao.setCredito(true);
 		} else if (tipoCartao.equals(TipoCartao.DEBITO)) {

@@ -15,6 +15,8 @@ import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.TipoCartao;
 import br.com.projetoBanco.beans.TipoChavePix;
+import br.com.projetoBanco.beans.TipoSeguro;
+import br.com.projetoBanco.bo.ApoliceBo;
 import br.com.projetoBanco.bo.CartaoBo;
 import br.com.projetoBanco.bo.ClienteBo;
 import br.com.projetoBanco.bo.ComprasBo;
@@ -23,6 +25,7 @@ import br.com.projetoBanco.bo.ContaCorrenteBo;
 import br.com.projetoBanco.bo.ContaPoupancaBo;
 import br.com.projetoBanco.bo.EnderecoBo;
 import br.com.projetoBanco.bo.PixBo;
+import br.com.projetoBanco.bo.SeguroBo;
 
 public class MenuPrincipal {
 	// criar metodos menus para cada fase e chamar no main
@@ -884,6 +887,7 @@ public class MenuPrincipal {
 									System.out.println("5- Habilitar cartão");// ok
 									System.out.println("6- Bloquear cartão");// ok
 									System.out.println("7- Alterar limite do cartão");// ok
+									System.out.println("8- Seguros");
 									System.out.println("0- Sair");
 									opcao = sc.nextInt();
 
@@ -916,7 +920,7 @@ public class MenuPrincipal {
 													valorFatura += obj.getValorCompra();
 												}
 											} catch (Exception e) {
-												// TODO: handle exception
+
 											}
 										}
 										System.out.println("Sua fatura tem o valor total de R$ " + valorFatura);
@@ -932,9 +936,9 @@ public class MenuPrincipal {
 													valorFatura += obj.getValorCompra();
 												}
 											} catch (Exception e) {
-												// TODO: handle exception
+												//
 											}
-											
+
 										}
 										System.out.println("Sua fatura tem um valor total de: R$ " + valorFatura);
 										///
@@ -1021,9 +1025,126 @@ public class MenuPrincipal {
 													"Seu novo limite é: R$ " + cartao.getCartaoCredito().getLimite());
 										}
 										break;
+									case 8:// Seguros
+										SeguroBo seguro = new SeguroBo();
+										ApoliceBo apolice = new ApoliceBo();
+										while (opcao != -1) {
+											System.out.println("---Seguros---");
+											System.out.println("1- Contratar seguro");
+											System.out.println("2- Consultar apolice de seguro");
+											System.out.println("0- Sair");
+											opcao = sc.nextInt();
+											sc.nextLine();
+											switch (opcao) {
+											case 0:
+												opcao = -1;
+												break;
+
+											case 1:
+												while (opcao != -1) {
+													String[] regras;
+													System.out.println("---Contratar Seguro---");
+													System.out.println("1- Seguro de vida");
+													System.out.println("2- Seguro invalidez");
+													System.out.println("3- Seguro desemprego");
+													System.out.println("0- Sair");
+													opcao = sc.nextInt();
+													sc.nextLine();
+													switch (opcao) {
+													case 0:
+														opcao = -1;
+														break;
+													case 1:
+														if (apolice.seguroContratado(cartao.getCartaoCredito(),
+																TipoSeguro.MORTE)) {
+															System.out.println("Seguro de vida já contratado");
+															System.out.println("Apólice de número: ");
+														} else {
+															System.out.println("---Seguro de vida---");
+															System.out.println("Regras: ");
+															regras = seguro.regasSeguro(TipoSeguro.MORTE);
+															for (String obj : regras) {
+																System.out.println(obj);
+															}
+															
+															
+															System.out.println(
+																	"Deseja contratar o seguro de vida? s/n");
+															valida = sc.next().toLowerCase();
+															while (!valida.equals("s") && !valida.equals("n")) {
+																System.out.println(
+																		"Deseja contratar o seguro de vida? s/n");
+																valida = sc.next().toLowerCase();
+															}
+															sc.nextLine();
+															if (valida.equals("s")) {
+															///metodo para adicionar o seguro
+																apolice.gerarApolice(seguro.cadastrarSeguro("Seguro de Vida", regras, TipoSeguro.MORTE));
+																System.out.println("Seguro de vida contratado com sucesso");
+																
+																System.out.println("--------------------------------------");
+																try {
+																	contaCorrente.getCartao().getCartaoCredito().getApolice().getSeguro().get(0).getNome();
+																	System.out.println(contaCorrente.getCartao().getCartaoCredito().getApolice().getSeguro().get(0).getNome());
+																} catch (Exception e) {
+																	
+																	System.out.println("Deu erro");
+																}
+																
+															} else {
+																System.out.println("O seguro não foi contratado");
+															}
+														}
+														break;
+													case 2:
+														if (apolice.seguroContratado(cartao.getCartaoCredito(),
+																TipoSeguro.INVALIDEZ)) {
+															System.out.println("Seguro invalidez já contratado");
+															System.out.println("Apólice de número: ");
+														} else {
+															System.out.println("---Seguro invalidez---");
+															System.out.println("Regras: ");
+															regras = seguro.regasSeguro(TipoSeguro.INVALIDEZ);
+															for (String obj : regras) {
+																System.out.println(obj);
+															}
+														}
+														break;
+													case 3:
+														if (apolice.seguroContratado(cartao.getCartaoCredito(),
+																TipoSeguro.DESEMPREGO)) {
+															System.out.println("Seguro desemprego já contratado");
+															System.out.println("Apólice de número: ");
+														} else {
+															System.out.println("---Seguro desemprego---");
+															System.out.println("Regras: ");
+															regras = seguro.regasSeguro(TipoSeguro.DESEMPREGO);
+															for (String obj : regras) {
+																System.out.println(obj);
+															}
+														}
+														break;
+													default:
+														System.out.println("Opção inválida, tente novamente!!!");
+														break;
+													}
+												}
+												opcao = 0;
+												break;
+
+											default:
+												System.out.println("Opção inválida, tente novamente!!!");
+
+												break;
+											}
+
+										}
+										opcao = 0;
+										break;
+
 									default:
 										System.out.println("Opção inválida, tente novamente!!!");
-										opcao = -1;
+										// opcao = -1;
 										break;
 
 									}
@@ -1052,7 +1173,7 @@ public class MenuPrincipal {
 									senha = sc.next();
 								}
 								if (senha.equals(cartao.getSenha())) {
-									double valorFatura = 0.0;
+
 									String valida = "";
 									System.out.println("Cartão de débito");
 									System.out.println("1- Limite de transação");// ok
@@ -1087,7 +1208,7 @@ public class MenuPrincipal {
 															+ " - " + obj.getValorCompra());
 												}
 											} catch (Exception e) {
-												// TODO: handle exception
+
 											}
 
 										}
@@ -1429,7 +1550,6 @@ public class MenuPrincipal {
 				// CONSTRUIR
 				while (opcao != -1) {
 
-					int dia;
 					String vencimentoCartao;
 					String senha = "";
 					int bandeiraCartao;
@@ -1546,7 +1666,7 @@ public class MenuPrincipal {
 															+ " - " + obj.getValorCompra());
 												}
 											} catch (Exception e) {
-												// TODO: handle exception
+
 											}
 
 										}
