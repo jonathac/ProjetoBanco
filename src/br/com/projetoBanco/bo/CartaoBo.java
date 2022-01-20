@@ -198,33 +198,25 @@ public class CartaoBo {
 		return retorno;
 	}
 
-	public boolean autorizarCompraDebito(CartaoDebito cartaoDebito, Double valorCompra) {
+	public boolean autorizarCompraDebito(Cartao cartao, Double valorCompra) {
 		boolean retorno = false;
-	
-		double saldo = 0.0;
 		
-		//NÃO FUNCIONAAAAAAAAAAAAAAAAA
-		
-		System.out.println("Saldo em conta: " + saldo);
-		System.out.println("limite de transacao disponivel " + (cartaoDebito.getLimiteTransacao() >= valorCompra));
-		System.out.println("Cartao bloqueado: " + !cartaoDebito.isDebitoBloqueado());
-		System.out.println("Cartão de debito ativo: " + cartaoDebito.isAtivo());
-		System.out.println("saldo em conta maior que compra " + (saldo >= valorCompra));
-
-		
+		CartaoDebito cartaoDebito = cartao.getCartaoDebito();
+		Conta conta = cartao.getConta();
+		double saldo = conta.getSaldo();
+			
 		if (cartaoDebito.getLimiteTransacao() >= valorCompra && !cartaoDebito.isDebitoBloqueado()
 				&& saldo >= valorCompra && cartaoDebito.isAtivo()) {
-			
-			//inserir atualização da conta
-			retorno = true;
+				retorno = true;
 		}
 
+		
 		return retorno;
 	}
 	
-	public void atualizarSaldoContaCorrente (ContaCorrente contaCorrente, double valorCompra) {
-		double saldo = contaCorrente.getSaldo();
-		contaCorrente.setSaldo(saldo-valorCompra);
+	public void atualizarSaldoConta (Conta conta, double valorCompra) {
+		double saldo = conta.getSaldo();
+		conta.setSaldo(saldo-valorCompra);
 	}
 	
 	public boolean pagarFatura (ContaCorrente contaCorrente, CartaoCredito cartaoCredito) {
@@ -239,6 +231,12 @@ public class CartaoBo {
 		}
 		
 		return retorno;
+	}
+	
+	public void alterarLimiteDebito (CartaoDebito cartaoDebito, double novoLimiteDebito) {
+	
+		cartaoDebito.setLimiteTransacao(novoLimiteDebito);
+
 	}
 	
 }

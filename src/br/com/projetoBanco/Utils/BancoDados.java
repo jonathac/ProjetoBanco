@@ -130,7 +130,7 @@ public class BancoDados {
 	public void cadastrarCartao(Cartao cartao) {
 		this.cartao.add(cartao);
 	}
-
+	
 	public Cartao consultarCartao(Conta conta) {
 		Cartao cartao = new Cartao();
 
@@ -143,6 +143,18 @@ public class BancoDados {
 		return cartao;
 	}
 
+	public Cartao consultarCartaoNumero(String numeroCartao) {
+		Cartao cartao = null;
+
+		for (Cartao obj : this.cartao) {
+			if (obj.getNumero().equals(numeroCartao)) {
+				cartao = obj;
+			}
+		}
+
+		return cartao;
+	}
+	
 	public Cartao consultarCartaoCpf(String cpfCliente) {
 		Cartao cartao = null;
 
