@@ -7,12 +7,14 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import br.com.projetoBanco.Utils.BancoDados;
+import br.com.projetoBanco.beans.Apolice;
 import br.com.projetoBanco.beans.BandeiraCartao;
 import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.Cliente;
 import br.com.projetoBanco.beans.Compras;
 import br.com.projetoBanco.beans.ContaCorrente;
 import br.com.projetoBanco.beans.ContaPoupanca;
+import br.com.projetoBanco.beans.Seguro;
 import br.com.projetoBanco.beans.TipoCartao;
 import br.com.projetoBanco.beans.TipoChavePix;
 import br.com.projetoBanco.beans.TipoSeguro;
@@ -1032,6 +1034,7 @@ public class MenuPrincipal {
 											System.out.println("---Seguros---");
 											System.out.println("1- Contratar seguro");
 											System.out.println("2- Consultar apolice de seguro");
+											System.out.println("3- Resgatar seguro");
 											System.out.println("0- Sair");
 											opcao = sc.nextInt();
 											sc.nextLine();
@@ -1043,6 +1046,8 @@ public class MenuPrincipal {
 											case 1:
 												while (opcao != -1) {
 													String[] regras;
+													cartao = bancoDados.consultarCartao(contaCorrente);
+
 													System.out.println("---Contratar Seguro---");
 													System.out.println("1- Seguro de vida");
 													System.out.println("2- Seguro invalidez");
@@ -1058,7 +1063,8 @@ public class MenuPrincipal {
 														if (apolice.seguroContratado(cartao.getCartaoCredito(),
 																TipoSeguro.MORTE)) {
 															System.out.println("Seguro de vida já contratado");
-															System.out.println("Apólice de número: ");
+															System.out.println("Apólice de número: "
+																	+ cartao.getCartaoCredito().getApolice().getId());
 														} else {
 															System.out.println("---Seguro de vida---");
 															System.out.println("Regras: ");
@@ -1066,10 +1072,9 @@ public class MenuPrincipal {
 															for (String obj : regras) {
 																System.out.println(obj);
 															}
-															
-															
-															System.out.println(
-																	"Deseja contratar o seguro de vida? s/n");
+
+															System.out
+																	.println("Deseja contratar o seguro de vida? s/n");
 															valida = sc.next().toLowerCase();
 															while (!valida.equals("s") && !valida.equals("n")) {
 																System.out.println(
@@ -1077,30 +1082,60 @@ public class MenuPrincipal {
 																valida = sc.next().toLowerCase();
 															}
 															sc.nextLine();
-															if (valida.equals("s")) {
-															///metodo para adicionar o seguro
-																apolice.gerarApolice(seguro.cadastrarSeguro("Seguro de Vida", regras, TipoSeguro.MORTE));
-																System.out.println("Seguro de vida contratado com sucesso");
-																
-																System.out.println("--------------------------------------");
-																try {
-																	contaCorrente.getCartao().getCartaoCredito().getApolice().getSeguro().get(0).getNome();
-																	System.out.println(contaCorrente.getCartao().getCartaoCredito().getApolice().getSeguro().get(0).getNome());
-																} catch (Exception e) {
-																	
-																	System.out.println("Deu erro");
+															if (valida.equals("s") && this.cartao
+																	.autorizarCompraCredito(cartao.getCartaoCredito(),
+																			seguro.valorSeguro(TipoSeguro.MORTE))) {
+																/// metodo para adicionar o seguro
+
+																if (!cartao.getCartaoCredito().getApolice().getId()
+																		.equals("")) {
+																	this.cartao.cadastrarApolice(
+																			cartao.getCartaoCredito(),
+																			apolice.adicionarSeguro(seguro
+																					.cadastrarSeguro("Seguro de Vida",
+																							regras, TipoSeguro.MORTE)));
+																	bancoDados.cadastrarCompras(
+																			compras.cadastrarComprasCredito(
+																					"Contrato seguro de Morte",
+																					seguro.valorSeguro(
+																							TipoSeguro.MORTE),
+																					cartao.getCartaoCredito()));
+																	System.out.println(
+																			"Seguro de vida contratado com sucesso");
+
+																} else {
+																	this.cartao.cadastrarApolice(
+																			cartao.getCartaoCredito(),
+																			apolice.gerarApolice(seguro.cadastrarSeguro(
+																					"Seguro de Vida", regras,
+																					TipoSeguro.MORTE)));
+																	bancoDados.cadastrarCompras(
+																			compras.cadastrarComprasCredito(
+																					"Contrato seguro de Morte",
+																					seguro.valorSeguro(
+																							TipoSeguro.MORTE),
+																					cartao.getCartaoCredito()));
+																	System.out.println(
+																			"Seguro de vida contratado com sucesso");
+
 																}
-																
+															} else if (!this.cartao.autorizarCompraCredito(
+																	cartao.getCartaoCredito(),
+																	seguro.valorSeguro(TipoSeguro.MORTE))) {
+																System.out.println("O seguro não foi contratado");
+																System.out.println("Saldo insuficiente");
 															} else {
 																System.out.println("O seguro não foi contratado");
 															}
 														}
+														opcao = -1;
 														break;
 													case 2:
 														if (apolice.seguroContratado(cartao.getCartaoCredito(),
 																TipoSeguro.INVALIDEZ)) {
 															System.out.println("Seguro invalidez já contratado");
-															System.out.println("Apólice de número: ");
+															System.out.println("Apólice de número: "
+																	+ cartao.getCartaoCredito().getApolice().getId());
 														} else {
 															System.out.println("---Seguro invalidez---");
 															System.out.println("Regras: ");
@@ -1108,13 +1143,71 @@ public class MenuPrincipal {
 															for (String obj : regras) {
 																System.out.println(obj);
 															}
+															System.out.println(
+																	"Deseja contratar o seguro invalidez? s/n");
+															valida = sc.next().toLowerCase();
+															while (!valida.equals("s") && !valida.equals("n")) {
+																System.out.println(
+																		"Deseja contratar o seguro invalidez? s/n");
+																valida = sc.next().toLowerCase();
+															}
+															sc.nextLine();
+															if (valida.equals("s") && this.cartao
+																	.autorizarCompraCredito(cartao.getCartaoCredito(),
+																			seguro.valorSeguro(TipoSeguro.INVALIDEZ))) {
+																/// metodo para adicionar o seguro
+
+																if (!cartao.getCartaoCredito().getApolice().getId()
+																		.equals("")) {
+																	this.cartao.cadastrarApolice(
+																			cartao.getCartaoCredito(),
+																			apolice.adicionarSeguro(
+																					seguro.cadastrarSeguro(
+																							"Seguro Invalidez", regras,
+																							TipoSeguro.INVALIDEZ)));
+																	bancoDados.cadastrarCompras(
+																			compras.cadastrarComprasCredito(
+																					"Contrato seguro de Invalidez",
+																					seguro.valorSeguro(
+																							TipoSeguro.INVALIDEZ),
+																					cartao.getCartaoCredito()));
+																	System.out.println(
+																			"Seguro invalidez contratado com sucesso");
+
+																} else {
+																	this.cartao.cadastrarApolice(
+																			cartao.getCartaoCredito(),
+																			apolice.gerarApolice(seguro.cadastrarSeguro(
+																					"Seguro Invalidez", regras,
+																					TipoSeguro.INVALIDEZ)));
+																	bancoDados.cadastrarCompras(
+																			compras.cadastrarComprasCredito(
+																					"Contrato seguro de Invalidez",
+																					seguro.valorSeguro(
+																							TipoSeguro.INVALIDEZ),
+																					cartao.getCartaoCredito()));
+																	System.out.println(
+																			"Seguro invalidez contratado com sucesso");
+																}
+
+															} else if (!this.cartao.autorizarCompraCredito(
+																	cartao.getCartaoCredito(),
+																	seguro.valorSeguro(TipoSeguro.MORTE))) {
+																System.out.println("O seguro não foi contratado");
+																System.out.println("Saldo insuficiente");
+															} else {
+																System.out.println("O seguro não foi contratado");
+															}
+
 														}
+														opcao = -1;
 														break;
 													case 3:
 														if (apolice.seguroContratado(cartao.getCartaoCredito(),
 																TipoSeguro.DESEMPREGO)) {
 															System.out.println("Seguro desemprego já contratado");
-															System.out.println("Apólice de número: ");
+															System.out.println("Apólice de número: "
+																	+ cartao.getCartaoCredito().getApolice().getId());
 														} else {
 															System.out.println("---Seguro desemprego---");
 															System.out.println("Regras: ");
@@ -1122,7 +1215,64 @@ public class MenuPrincipal {
 															for (String obj : regras) {
 																System.out.println(obj);
 															}
+
+															System.out.println(
+																	"Deseja contratar o seguro desemprego? s/n");
+															valida = sc.next().toLowerCase();
+															while (!valida.equals("s") && !valida.equals("n")) {
+																System.out.println(
+																		"Deseja contratar o seguro desemprego? s/n");
+																valida = sc.next().toLowerCase();
+															}
+															sc.nextLine();
+															if (valida.equals("s") && this.cartao
+																	.autorizarCompraCredito(cartao.getCartaoCredito(),
+																			seguro.valorSeguro(
+																					TipoSeguro.DESEMPREGO))) {
+																/// metodo para adicionar o seguro
+																if (!cartao.getCartaoCredito().getApolice().getId()
+																		.equals("")) {
+																	this.cartao.cadastrarApolice(
+																			cartao.getCartaoCredito(),
+																			apolice.adicionarSeguro(
+																					seguro.cadastrarSeguro(
+																							"Seguro Desemprego", regras,
+																							TipoSeguro.DESEMPREGO)));
+																	bancoDados.cadastrarCompras(
+																			compras.cadastrarComprasCredito(
+																					"Contrato seguro de Desemprego",
+																					seguro.valorSeguro(
+																							TipoSeguro.DESEMPREGO),
+																					cartao.getCartaoCredito()));
+																	System.out.println(
+																			"Seguro desemprego contratado com sucesso");
+
+																} else {
+																	this.cartao.cadastrarApolice(
+																			cartao.getCartaoCredito(),
+																			apolice.gerarApolice(seguro.cadastrarSeguro(
+																					"Seguro Desemprego", regras,
+																					TipoSeguro.DESEMPREGO)));
+																	bancoDados.cadastrarCompras(
+																			compras.cadastrarComprasCredito(
+																					"Contrato seguro de Desemprego",
+																					seguro.valorSeguro(
+																							TipoSeguro.DESEMPREGO),
+																					cartao.getCartaoCredito()));
+																	System.out.println(
+																			"Seguro desemprego contratado com sucesso");
+																}
+															} else if (!this.cartao.autorizarCompraCredito(
+																	cartao.getCartaoCredito(),
+																	seguro.valorSeguro(TipoSeguro.MORTE))) {
+																System.out.println("O seguro não foi contratado");
+																System.out.println("Saldo insuficiente");
+															} else {
+																System.out.println("O seguro não foi contratado");
+															}
+
 														}
+														opcao = -1;
 														break;
 													default:
 														System.out.println("Opção inválida, tente novamente!!!");
@@ -1131,7 +1281,103 @@ public class MenuPrincipal {
 												}
 												opcao = 0;
 												break;
+											case 2:
+												// consultar seguro
+												System.out.println("---Consultar Seguro---");
+												Apolice ap = cartao.getCartaoCredito().getApolice();
 
+												try {
+
+													if (ap.getId().equals("")) {
+														System.out.println("Você não possui seguros ativos");
+													} else {
+														System.out.println("Id apolice: " + ap.getId());
+														System.out.println("");
+														for (Seguro obj : ap.getSeguro()) {
+															System.out.println("---Seguro "
+																	+ (ap.getSeguro().indexOf(obj) + 1) + "---");
+															System.out.println("Nome: " + obj.getNome());
+															SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+															System.out.println("Data de contratação: "
+																	+ df.format(obj.getDataAssinatura()));
+															System.out.println(
+																	"Valor do seguro: " + obj.getValorSeguro());
+															System.out.println("Regras: ");
+
+															for (int i = 0; i < obj.getRegras().length; i++) {
+																String[] regras = obj.getRegras();
+																System.out.println(regras[i]);
+															}
+
+														}
+													}
+
+												} catch (Exception e) {
+
+												}
+												break;
+											case 3:
+												System.out.println("---Resgatar Seguro---");
+												ap = cartao.getCartaoCredito().getApolice();
+												
+												try {
+
+													if (ap.getId().equals("")) {
+														System.out.println("Você não possui seguros ativos");
+														break;
+													} else {
+														System.out.println("Seguros contratados");
+														System.out.println("Id apolice: " + ap.getId());
+														
+														for (Seguro obj : ap.getSeguro()) {
+															
+															System.out.println(ap.getSeguro().indexOf(obj) + "- "+ obj.getNome());
+
+														}
+														do {
+															System.out.println("Qual seguro você deseja resgatar?");
+															opcao=sc.nextInt();
+															sc.nextLine();
+														}
+														while(opcao <0 || opcao >=ap.getSeguro().size());
+													}
+													
+													
+
+												} catch (Exception e) {
+													break;
+												}
+												
+												////////retirar
+												Date teste = null;
+												System.out.println("Informe a data de hoje para simular o resgate: (dd/MM/yyyy)");
+												String dataTeste = sc.nextLine();
+												status = false;
+												while (status == false) {
+													try {
+														sdf = new SimpleDateFormat("dd/MM/yyyy");
+														teste = sdf.parse(dataTeste);
+														status = true;
+													} catch (ParseException e) {
+														System.out.println("Data no formato inválido");
+														System.out.println("Informe a data de hoje para simular o resgate: (dd/MM/yyyy)");
+														dataTeste = sc.nextLine();
+													}
+												}
+												//////
+																					
+												if (apolice.validarDataResgateSeguro(ap.getSeguro().get(opcao), teste)) {
+												apolice.resgatarApolice(contaCorrente, ap.getSeguro().get(opcao));
+												ap.getSeguro().remove(opcao);
+												System.out.println("resgate aplicado");
+												} else {
+													System.out.println("Você ainda está no prazo de carência");
+													sdf = new SimpleDateFormat("dd/MM/yyyy");
+													System.out.println("Sua data de carência é: " + sdf.format(ap.getSeguro().get(opcao).getDataCarencia()));
+												}
+												// construir
+												opcao = 0;
+												break;
 											default:
 												System.out.println("Opção inválida, tente novamente!!!");
 

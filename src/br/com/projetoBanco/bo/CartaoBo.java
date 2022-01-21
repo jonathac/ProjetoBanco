@@ -7,14 +7,13 @@ import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
-import br.com.projetoBanco.Utils.BancoDados;
+import br.com.projetoBanco.beans.Apolice;
 import br.com.projetoBanco.beans.BandeiraCartao;
 import br.com.projetoBanco.beans.Cartao;
 import br.com.projetoBanco.beans.CartaoCredito;
 import br.com.projetoBanco.beans.CartaoDebito;
 import br.com.projetoBanco.beans.Conta;
 import br.com.projetoBanco.beans.ContaCorrente;
-import br.com.projetoBanco.beans.ContaPoupanca;
 import br.com.projetoBanco.beans.TipoCartao;
 
 public class CartaoBo {
@@ -239,6 +238,10 @@ public class CartaoBo {
 	
 		cartaoDebito.setLimiteTransacao(novoLimiteDebito);
 
+	}
+	
+	public void cadastrarApolice (CartaoCredito cartaoCredito, Apolice apolice) {
+		cartaoCredito.setApolice(apolice);
 	}
 	
 }

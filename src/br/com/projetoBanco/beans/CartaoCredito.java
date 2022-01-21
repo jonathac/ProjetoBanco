@@ -10,7 +10,7 @@ public class CartaoCredito extends Cartao {
 	private double limiteDisponivel;
 	private double valorFatura;
 	private Date vencimentoFatura;
-	private Apolice apolice;
+	private Apolice apolice = new Apolice ();
 
 	public double getLimite() {
 		return limite;
@@ -62,5 +62,5 @@ public class CartaoCredito extends Cartao {
 	public void setApolice(Apolice apolice) {
 		this.apolice = apolice;
 	}
-
+	
 }

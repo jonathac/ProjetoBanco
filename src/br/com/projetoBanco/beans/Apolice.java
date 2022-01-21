@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 public class Apolice {
 
-	private String id;
-	private double valorApolice;
-	private String descricaoCondicoes;
+	private String id = "";
+	private double valorApolice = 0.0;
+	private String descricaoCondicoes = "";
 	private ArrayList<Seguro> seguro = new ArrayList<>();
+//private Seguro[] seguro = new Seguro [3];
 
 	public String getId() {
 		return id;
@@ -41,4 +42,12 @@ public class Apolice {
 		this.seguro = seguro;
 	}
 
+	@Override
+	public String toString() {
+		return "Apolice [id=" + id + ", valorApolice=" + valorApolice + ", descricaoCondicoes=" + descricaoCondicoes
+				+ ", seguro=" + seguro + "]";
+	}
+
+	
+	
 }

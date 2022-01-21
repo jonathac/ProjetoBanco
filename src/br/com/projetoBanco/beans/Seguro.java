@@ -11,6 +11,7 @@ public class Seguro {
 	private Date dataCarencia;
 	private double valorSeguro;
 	private TipoSeguro tipoSeguro;
+	private double bonusIdenizacao;
 
 	public String getId() {
 		return id;
@@ -66,6 +67,14 @@ public class Seguro {
 
 	public void setTipoSeguro(TipoSeguro tipoSeguro) {
 		this.tipoSeguro = tipoSeguro;
+	}
+
+	public double getBonusIdenizacao() {
+		return bonusIdenizacao;
+	}
+
+	public void setBonusIdenizacao(double bonusIdenizacao) {
+		this.bonusIdenizacao = bonusIdenizacao;
 	}
 
 }
