@@ -695,6 +695,9 @@ public class MenuPrincipal {
 					opcao = sc.nextInt();
 
 					switch (opcao) {
+					case 0: 
+						opcao = -1;
+						break;
 					case 1:
 
 						if (!bancoDados.verificaCartao(contaCorrente)) {
@@ -1446,8 +1449,8 @@ public class MenuPrincipal {
 										for (Compras obj : bancoDados.getCompras()) {
 
 											try {
-												obj.getCartaoCredito().equals(cartao.getCartaoDebito());
-												if (obj.getCartaoCredito().equals(cartao.getCartaoDebito())) {
+												obj.getCartaoDebito().equals(cartao.getCartaoDebito());
+												if (obj.getCartaoDebito().equals(cartao.getCartaoDebito())) {
 													SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 													String data = sdf.format(obj.getDataCompra());
 													System.out.println(data + " - " + obj.getEstabelecimentoCompra()
@@ -1812,6 +1815,9 @@ public class MenuPrincipal {
 					opcao = sc.nextInt();
 
 					switch (opcao) {
+					case 0: 
+						opcao = -1;
+						break;
 					case 1:
 
 						if (!bancoDados.verificaCartao(contaPoupanca)) {
@@ -1904,8 +1910,8 @@ public class MenuPrincipal {
 										for (Compras obj : bancoDados.getCompras()) {
 
 											try {
-												obj.getCartaoCredito().equals(cartao.getCartaoDebito());
-												if (obj.getCartaoCredito().equals(cartao.getCartaoDebito())) {
+												obj.getCartaoDebito().equals(cartao.getCartaoDebito());
+												if (obj.getCartaoDebito().equals(cartao.getCartaoDebito())) {
 													SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 													String data = sdf.format(obj.getDataCompra());
 													System.out.println(data + " - " + obj.getEstabelecimentoCompra()
