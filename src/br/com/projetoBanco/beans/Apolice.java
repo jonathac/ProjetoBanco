@@ -1,14 +1,14 @@
 package br.com.projetoBanco.beans;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Apolice {
 
 	private String id = "";
 	private double valorApolice = 0.0;
 	private String descricaoCondicoes = "";
-	private ArrayList<Seguro> seguro = new ArrayList<>();
-//private Seguro[] seguro = new Seguro [3];
+	private List<Seguro> seguro = new ArrayList<>();
 
 	public String getId() {
 		return id;
@@ -34,11 +34,11 @@ public class Apolice {
 		this.descricaoCondicoes = descricaoCondicoes;
 	}
 
-	public ArrayList<Seguro> getSeguro() {
+	public List<Seguro> getSeguro() {
 		return seguro;
 	}
 
-	public void setSeguro(ArrayList<Seguro> seguro) {
+	public void setSeguro(List<Seguro> seguro) {
 		this.seguro = seguro;
 	}
 

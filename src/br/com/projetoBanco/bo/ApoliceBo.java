@@ -75,8 +75,8 @@ public class ApoliceBo {
 		try {
 			for (Seguro obj : apolice.getSeguro()) {
 				double valorApolice = apolice.getValorApolice();
-				double valorSeguro = obj.getValorSeguro();
-				apolice.setValorApolice(valorApolice + valorSeguro);
+				double bonusIdenizacao = obj.getBonusIdenizacao();
+				apolice.setValorApolice(valorApolice + bonusIdenizacao);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

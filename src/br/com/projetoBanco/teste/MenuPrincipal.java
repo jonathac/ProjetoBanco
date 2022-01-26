@@ -245,6 +245,8 @@ public class MenuPrincipal {
 						opcao = 1;
 					} else if (!cartao.isDebitoBloqueado() && cartao.getCartaoDebito().isAtivo()) {
 						opcao = 2;
+					} else {
+						System.out.println("Compra não autorizada");
 					}
 					switch (opcao) {
 					case 1:

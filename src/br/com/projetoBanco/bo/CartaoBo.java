@@ -110,12 +110,12 @@ public class CartaoBo {
 
 	public void ativarCartao(Cartao cartao, boolean status) {
 		cartao.setAtivo(status);
-		/*if (!status) {
-			//cartao.setCreditoBloqueado(status);
+		if (!status) {
+			cartao.setCreditoBloqueado(status);
 			cartao.getCartaoCredito().setAtivo(status);
-			//cartao.setDebitoBloqueado(status);
+			cartao.setDebitoBloqueado(status);
 			cartao.getCartaoDebito().setAtivo(status);
-		}*/
+		}
 	}
 
 	public void adicionarCredito(Cartao cartao, String vencimentoCartao) {
