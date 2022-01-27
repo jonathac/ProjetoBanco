@@ -77,14 +77,14 @@ public class MenuPrincipal {
 						.cadastrarContaCorrente(bancoDados.getCliente().get(bancoDados.getCliente().size() - 1)));
 				bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
-				opcao = -1;
+				// opcao = -1;
 				break;
 			case 2:
 				bancoDados.cadastrarContaPoupanca(contaPoupancaBo
 						.cadastrarContaPoupanca(bancoDados.getCliente().get(bancoDados.getCliente().size() - 1)));
 				bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix.CPF, ""));
 				System.out.println("Conta cadastrada com sucesso!!!");
-				opcao = -1;
+				// opcao = -1;
 				break;
 			default:
 				System.out.println("Erro");
@@ -232,62 +232,65 @@ public class MenuPrincipal {
 						opcao = -1;
 						break;
 					}
+					if (cartao.isAtivo()) {
 
-					if (cartao.getCartaoCredito().isAtivo() && cartao.getCartaoDebito().isAtivo()) {
-						do {
-							System.out.println("Escolha a opcao de compra:");
-							System.out.println("1- Crédito");
-							System.out.println("2- Débito");
-							opcao = sc.nextInt();
+						if (cartao.getCartaoCredito().isAtivo() && cartao.getCartaoDebito().isAtivo()) {
+							do {
+								System.out.println("Escolha a opcao de compra:");
+								System.out.println("1- Crédito");
+								System.out.println("2- Débito");
+								opcao = sc.nextInt();
+								sc.nextLine();
+							} while (opcao != 1 && opcao != 2);
+						} else if (!cartao.isCreditoBloqueado() && cartao.getCartaoCredito().isAtivo()) {
+							opcao = 1;
+						} else if (!cartao.isDebitoBloqueado() && cartao.getCartaoDebito().isAtivo()) {
+							opcao = 2;
+						} else {
+							System.out.println("Compra não autorizada");
+						}
+						switch (opcao) {
+						case 1:
+							System.out.println("Informe a senha do seu cartão de crédito");
+							senha = sc.next();
 							sc.nextLine();
-						} while (opcao != 1 && opcao != 2);
-					} else if (!cartao.isCreditoBloqueado() && cartao.getCartaoCredito().isAtivo()) {
-						opcao = 1;
-					} else if (!cartao.isDebitoBloqueado() && cartao.getCartaoDebito().isAtivo()) {
-						opcao = 2;
+							if (senha.equals(cartao.getSenha())) {
+								if (this.cartao.autorizarCompraCredito(cartao.getCartaoCredito(), valorCompra)) {
+									bancoDados.cadastrarCompras(compras.cadastrarComprasCredito(estabelecimentoCompra,
+											valorCompra, cartao.getCartaoCredito()));
+									System.out.println("Compra autorizada");
+								} else {
+									System.out.println("Compra não autorizada");
+								}
+							} else {
+								System.out.println("Senha incorreta");
+							}
+							break;
+						case 2:
+							System.out.println("Informe a senha do seu cartão de débito");
+							senha = sc.next();
+							sc.nextLine();
+							if (senha.equals(cartao.getSenha())) {
+
+								if (this.cartao.autorizarCompraDebito(cartao, valorCompra)) {
+									bancoDados.cadastrarCompras(compras.cadastrarComprasDebito(estabelecimentoCompra,
+											valorCompra, cartao.getCartaoDebito()));
+									this.cartao.atualizarSaldoConta(cartao.getConta(), valorCompra);
+
+									/// debitar valor da compra na conta
+									System.out.println("Compra autorizada");
+									System.out.println();
+								} else {
+									System.out.println("Compra não autorizada");
+								}
+							} else {
+								System.out.println("Senha incorreta");
+							}
+							break;
+						}
 					} else {
 						System.out.println("Compra não autorizada");
 					}
-					switch (opcao) {
-					case 1:
-						System.out.println("Informe a senha do seu cartão de crédito");
-						senha = sc.next();
-						sc.nextLine();
-						if (senha.equals(cartao.getSenha())) {
-							if (this.cartao.autorizarCompraCredito(cartao.getCartaoCredito(), valorCompra)) {
-								bancoDados.cadastrarCompras(compras.cadastrarComprasCredito(estabelecimentoCompra,
-										valorCompra, cartao.getCartaoCredito()));
-								System.out.println("Compra autorizada");
-							} else {
-								System.out.println("Compra não autorizada");
-							}
-						} else {
-							System.out.println("Senha incorreta");
-						}
-						break;
-					case 2:
-						System.out.println("Informe a senha do seu cartão de débito");
-						senha = sc.next();
-						sc.nextLine();
-						if (senha.equals(cartao.getSenha())) {
-
-							if (this.cartao.autorizarCompraDebito(cartao, valorCompra)) {
-								bancoDados.cadastrarCompras(compras.cadastrarComprasDebito(estabelecimentoCompra,
-										valorCompra, cartao.getCartaoDebito()));
-								this.cartao.atualizarSaldoConta(cartao.getConta(), valorCompra);
-
-								/// debitar valor da compra na conta
-								System.out.println("Compra autorizada");
-								System.out.println();
-							} else {
-								System.out.println("Compra não autorizada");
-							}
-						} else {
-							System.out.println("Senha incorreta");
-						}
-						break;
-					}
-
 					System.out.println("Deseja realizar mais alguma compra? s/n");
 					String valida = sc.next().toLowerCase();
 					sc.nextLine();
@@ -512,7 +515,7 @@ public class MenuPrincipal {
 	}
 
 	public void subMenuTransacoesContaCorrente(ContaCorrente contaCorrente) {
-
+		int opcao = 0;
 		while (opcao != -1) {
 
 			boolean status = false;
@@ -616,12 +619,13 @@ public class MenuPrincipal {
 				break;
 
 			case 4:
+
 				while (opcao != -1) {
 					System.out.println("---Pix---");
 					System.out.println("1- Cadastrar chave Pix");
 					System.out.println("2- Realizar Pix");
 					System.out.println("0- Sair");
-					int opcao = sc.nextInt();
+					opcao = sc.nextInt();
 
 					switch (opcao) {
 					case 0:
@@ -637,20 +641,26 @@ public class MenuPrincipal {
 
 							System.out.println("Insira a chave pix da conta a receber: ");
 							chavePix = sc.next();
-							if (pixBo.validaPix(bancoDados.consultarChavePix(chavePix).getPix())) {
-								System.out.println("Insira o valor da trasnferencia: ");
-								valorTransferir = sc.nextDouble();
-								status = contaBo.transferencia(valorTransferir, contaCorrente,
-										bancoDados.consultarChavePix(chavePix), false);
+							try {
+								if (pixBo.validaPix(bancoDados.consultarChavePix(chavePix).getPix())) {
+									System.out.println("Insira o valor da trasnferencia: ");
+									valorTransferir = sc.nextDouble();
+									status = contaBo.transferencia(valorTransferir, contaCorrente,
+											bancoDados.consultarChavePix(chavePix), false);
 
-								if (status == true) {
-									System.out.println("Transferencia realizada com sucesso...");
+									if (status == true) {
+										System.out.println("Transferencia realizada com sucesso...");
+									} else {
+										System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+									}
 								} else {
-									System.out.println("Não foi possivel realizar transferencia, tente novamente...");
+									System.out.println("Chave pix não encontrada.");
 								}
-							} else {
+							} catch (Exception e) {
 								System.out.println("Chave pix não encontrada.");
 							}
+							
+							
 
 						} else {
 							System.out.println("Chave Pix não ativada.");
@@ -664,6 +674,8 @@ public class MenuPrincipal {
 						break;
 					// opcao = -1;
 					}
+
+					// opcao = -1;
 				}
 
 				opcao = 0;
@@ -697,7 +709,7 @@ public class MenuPrincipal {
 					opcao = sc.nextInt();
 
 					switch (opcao) {
-					case 0: 
+					case 0:
 						opcao = -1;
 						break;
 					case 1:
@@ -1068,8 +1080,16 @@ public class MenuPrincipal {
 														if (apolice.seguroContratado(cartao.getCartaoCredito(),
 																TipoSeguro.MORTE)) {
 															System.out.println("Seguro de vida já contratado");
-															System.out.println("Apólice de número: "
-																	+ cartao.getCartaoCredito().getApolice().getId());
+
+															for (Seguro obj : cartao.getCartaoCredito().getApolice()
+																	.getSeguro()) {
+
+																if (obj.getTipoSeguro().equals(TipoSeguro.MORTE)) {
+																	System.out.println("Id apolice: " + obj.getId());
+																}
+
+															}
+
 														} else {
 															System.out.println("---Seguro de vida---");
 															System.out.println("Regras: ");
@@ -1139,8 +1159,15 @@ public class MenuPrincipal {
 														if (apolice.seguroContratado(cartao.getCartaoCredito(),
 																TipoSeguro.INVALIDEZ)) {
 															System.out.println("Seguro invalidez já contratado");
-															System.out.println("Apólice de número: "
-																	+ cartao.getCartaoCredito().getApolice().getId());
+
+															for (Seguro obj : cartao.getCartaoCredito().getApolice()
+																	.getSeguro()) {
+
+																if (obj.getTipoSeguro().equals(TipoSeguro.INVALIDEZ)) {
+																	System.out.println("Id apolice: " + obj.getId());
+																}
+
+															}
 														} else {
 															System.out.println("---Seguro invalidez---");
 															System.out.println("Regras: ");
@@ -1211,8 +1238,16 @@ public class MenuPrincipal {
 														if (apolice.seguroContratado(cartao.getCartaoCredito(),
 																TipoSeguro.DESEMPREGO)) {
 															System.out.println("Seguro desemprego já contratado");
-															System.out.println("Apólice de número: "
-																	+ cartao.getCartaoCredito().getApolice().getId());
+
+															for (Seguro obj : cartao.getCartaoCredito().getApolice()
+																	.getSeguro()) {
+
+																if (obj.getTipoSeguro().equals(TipoSeguro.DESEMPREGO)) {
+																	System.out.println("Id apolice: " + obj.getId());
+																}
+
+															}
+
 														} else {
 															System.out.println("---Seguro desemprego---");
 															System.out.println("Regras: ");
@@ -1296,12 +1331,13 @@ public class MenuPrincipal {
 													if (ap.getId().equals("")) {
 														System.out.println("Você não possui seguros ativos");
 													} else {
-														System.out.println("Id apolice: " + ap.getId());
+														// System.out.println("Id apolice: " + ap.getId());
 														System.out.println("");
 														for (Seguro obj : ap.getSeguro()) {
 															System.out.println("---Seguro "
 																	+ (ap.getSeguro().indexOf(obj) + 1) + "---");
 															System.out.println("Nome: " + obj.getNome());
+															System.out.println("Id apolice: " + obj.getId());
 															SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 															System.out.println("Data de contratação: "
 																	+ df.format(obj.getDataAssinatura()));
@@ -1324,7 +1360,7 @@ public class MenuPrincipal {
 											case 3:
 												System.out.println("---Resgatar Seguro---");
 												ap = cartao.getCartaoCredito().getApolice();
-												
+
 												try {
 
 													if (ap.getId().equals("")) {
@@ -1333,29 +1369,28 @@ public class MenuPrincipal {
 													} else {
 														System.out.println("Seguros contratados");
 														System.out.println("Id apolice: " + ap.getId());
-														
+
 														for (Seguro obj : ap.getSeguro()) {
-															
-															System.out.println(ap.getSeguro().indexOf(obj) + "- "+ obj.getNome());
+
+															System.out.println(
+																	ap.getSeguro().indexOf(obj) + "- " + obj.getNome());
 
 														}
 														do {
 															System.out.println("Qual seguro você deseja resgatar?");
-															opcao=sc.nextInt();
+															opcao = sc.nextInt();
 															sc.nextLine();
-														}
-														while(opcao <0 || opcao >=ap.getSeguro().size());
+														} while (opcao < 0 || opcao >= ap.getSeguro().size());
 													}
-													
-													
 
 												} catch (Exception e) {
 													break;
 												}
-												
-												////////retirar
+
+												//////// retirar
 												Date teste = null;
-												System.out.println("Informe a data de hoje para simular o resgate: (dd/MM/yyyy)");
+												System.out.println(
+														"Informe a data de hoje para simular o resgate: (dd/MM/yyyy)");
 												String dataTeste = sc.nextLine();
 												status = false;
 												while (status == false) {
@@ -1365,20 +1400,23 @@ public class MenuPrincipal {
 														status = true;
 													} catch (ParseException e) {
 														System.out.println("Data no formato inválido");
-														System.out.println("Informe a data de hoje para simular o resgate: (dd/MM/yyyy)");
+														System.out.println(
+																"Informe a data de hoje para simular o resgate: (dd/MM/yyyy)");
 														dataTeste = sc.nextLine();
 													}
 												}
 												//////
-																					
-												if (apolice.validarDataResgateSeguro(ap.getSeguro().get(opcao), teste)) {
-												apolice.resgatarApolice(contaCorrente, ap.getSeguro().get(opcao));
-												ap.getSeguro().remove(opcao);
-												System.out.println("resgate aplicado");
+
+												if (apolice.validarDataResgateSeguro(ap.getSeguro().get(opcao),
+														teste)) {
+													apolice.resgatarApolice(contaCorrente, ap.getSeguro().get(opcao));
+													ap.getSeguro().remove(opcao);
+													System.out.println("resgate aplicado");
 												} else {
 													System.out.println("Você ainda está no prazo de carência");
 													sdf = new SimpleDateFormat("dd/MM/yyyy");
-													System.out.println("Sua data de carência é: " + sdf.format(ap.getSeguro().get(opcao).getDataCarencia()));
+													System.out.println("Sua data de carência é: "
+															+ sdf.format(ap.getSeguro().get(opcao).getDataCarencia()));
 												}
 												// construir
 												opcao = 0;
@@ -1637,6 +1675,7 @@ public class MenuPrincipal {
 
 		while (opcao != -1) {
 
+			int opcao = 0;
 			boolean status = false;
 			double deposito = 0.0;
 			double saque = 0.0;
@@ -1647,9 +1686,9 @@ public class MenuPrincipal {
 			System.out.println("1- Deposito");
 			System.out.println("2- Saque");
 			System.out.println("3- Transferência");
-			System.out.println("4- Pix");
-			System.out.println("5- Saldo");
-			System.out.println("6- Cartão");
+			// System.out.println("4- Pix");
+			System.out.println("4- Saldo");
+			System.out.println("5- Cartão");
 			System.out.println("0- Sair");
 			opcao = sc.nextInt();
 
@@ -1737,67 +1776,48 @@ public class MenuPrincipal {
 				}
 				// opcao = -1;
 				break;
+			/*
+			 * case 4:
+			 * 
+			 * while (opcao != -1) { System.out.println("---Pix---");
+			 * System.out.println("1- Cadastrar chave Pix");
+			 * System.out.println("2- Realizar Pix"); System.out.println("0- Sair"); opcao =
+			 * sc.nextInt();
+			 * 
+			 * switch (opcao) {
+			 * 
+			 * case 0: opcao = -1; break; case 1:
+			 * cadastrarChavePix(contaPoupanca.getCliente()); // opcao = -1; break; case 2:
+			 * if (pixBo.validaPix(contaPoupanca.getPix())) {
+			 * 
+			 * System.out.println("Insira a chave pix da conta a receber: "); chavePix =
+			 * sc.next(); if
+			 * (pixBo.validaPix(bancoDados.consultarChavePix(chavePix).getPix())) {
+			 * System.out.println("Insira o valor da trasnferencia: "); valorTransferir =
+			 * sc.nextDouble(); status = contaBo.transferencia(valorTransferir,
+			 * contaPoupanca, bancoDados.consultarChavePix(chavePix), false);
+			 * 
+			 * if (status == true) {
+			 * System.out.println("Transferencia realizada com sucesso..."); } else {
+			 * System.out.
+			 * println("Não foi possivel realizar transferencia, tente novamente..."); } }
+			 * else { System.out.println("Chave pix não encontrada."); }
+			 * 
+			 * } else { System.out.println("Chave Pix não ativada.");
+			 * System.out.println("Realize o ativacao da chave pix e tente novamente"); }
+			 * 
+			 * // opcao = -1; break;
+			 * 
+			 * default: System.out.println("Opcao invalida, tente novamente"); opcao = -1;
+			 * break; } opcao = -1; } break;
+			 */
 			case 4:
-
-				while (opcao != -1) {
-					System.out.println("---Pix---");
-					System.out.println("1- Cadastrar chave Pix");
-					System.out.println("2- Realizar Pix");
-					System.out.println("0- Sair");
-					int opcao = sc.nextInt();
-
-					switch (opcao) {
-
-					case 0:
-						opcao = -1;
-						break;
-					case 1:
-						cadastrarChavePix(contaPoupanca.getCliente());
-						// opcao = -1;
-						break;
-					case 2:
-						if (pixBo.validaPix(contaPoupanca.getPix())) {
-
-							System.out.println("Insira a chave pix da conta a receber: ");
-							chavePix = sc.next();
-							if (pixBo.validaPix(bancoDados.consultarChavePix(chavePix).getPix())) {
-								System.out.println("Insira o valor da trasnferencia: ");
-								valorTransferir = sc.nextDouble();
-								status = contaBo.transferencia(valorTransferir, contaPoupanca,
-										bancoDados.consultarChavePix(chavePix), false);
-
-								if (status == true) {
-									System.out.println("Transferencia realizada com sucesso...");
-								} else {
-									System.out.println("Não foi possivel realizar transferencia, tente novamente...");
-								}
-							} else {
-								System.out.println("Chave pix não encontrada.");
-							}
-
-						} else {
-							System.out.println("Chave Pix não ativada.");
-							System.out.println("Realize o ativacao da chave pix e tente novamente");
-						}
-
-						// opcao = -1;
-						break;
-
-					default:
-						System.out.println("Opcao invalida, tente novamente");
-						opcao = -1;
-						break;
-					}
-					opcao = -1;
-				}
-				break;
-			case 5:
 				System.out.println("---Saldo---");
 				System.out.println(contaBo.exibirSaldo(contaPoupanca, contaPoupanca.getCliente()));
 
 				break;
 
-			case 6:
+			case 5:
 				// CONSTRUIR
 				while (opcao != -1) {
 
@@ -1808,16 +1828,16 @@ public class MenuPrincipal {
 
 					System.out.println("---Cartões---");
 					System.out.println("1- Solicitar Cartão");
-					System.out.println("3- Acessar cartão de débito");
-					System.out.println("4- Informar perda ou roubo");
-					System.out.println("5- Alterar senha");
-					System.out.println("6- Habilitar cartão");
-					System.out.println("7- Exibir dados do cartão");
+					System.out.println("2- Acessar cartão de débito");
+					System.out.println("3- Informar perda ou roubo");
+					System.out.println("4- Alterar senha");
+					System.out.println("5- Habilitar cartão");
+					System.out.println("6- Exibir dados do cartão");
 					System.out.println("0- Sair");
 					opcao = sc.nextInt();
 
 					switch (opcao) {
-					case 0: 
+					case 0:
 						opcao = -1;
 						break;
 					case 1:
@@ -1871,7 +1891,7 @@ public class MenuPrincipal {
 
 						break;
 
-					case 3:
+					case 2:
 						cartao = bancoDados.consultarCartao(contaPoupanca);
 						while (opcao != -1) {
 
@@ -1990,7 +2010,7 @@ public class MenuPrincipal {
 						}
 						opcao = 0;
 						break;
-					case 4:
+					case 3:
 						System.out.println("Perda ou Roubo");
 						cartao = bancoDados.consultarCartao(contaPoupanca);
 						if (bancoDados.verificaCartao(contaPoupanca)) {
@@ -2012,7 +2032,7 @@ public class MenuPrincipal {
 						}
 						// opcao = -1;
 						break;
-					case 5:
+					case 4:
 						System.out.println("Alterar senha");
 						cartao = bancoDados.consultarCartao(contaPoupanca);
 
@@ -2039,7 +2059,7 @@ public class MenuPrincipal {
 						}
 						break;
 
-					case 6:
+					case 5:
 						System.out.println("Habilitar cartão");
 						cartao = bancoDados.consultarCartao(contaPoupanca);
 
@@ -2062,7 +2082,7 @@ public class MenuPrincipal {
 						}
 						// opcao = -1;
 						break;
-					case 7:
+					case 6:
 						if (bancoDados.verificaCartao(contaPoupanca)) {
 							cartao = bancoDados.consultarCartao(contaPoupanca);
 							System.out.println("---Exibir dados do cartao---");
@@ -2087,12 +2107,14 @@ public class MenuPrincipal {
 	}
 
 	public void cadastrarChavePix(Cliente cliente) {
+		int opcao = 0;
 		boolean status = false;
 
 		ContaCorrente cc = bancoDados.acessarContaCorrente(cliente);
 		status = pixBo.validaPix(cc.getPix());
 
 		if (!status) {
+
 			System.out.println("---Cadastrar Chave Pix---");
 			System.out.println("Cliente selecionado: " + cliente.getNome());
 			System.out.println("Selecione o tipo de chave Pix a cadastrar:");
@@ -2105,9 +2127,9 @@ public class MenuPrincipal {
 
 			switch (opcao) {
 
-			case 0:
-				opcao = -1;
-				break;
+			/*
+			 * case 0: opcao = -1; break;
+			 */
 			case 1:
 				tipoChavePix = tipoChavePix.CPF;
 				conteudoChavePix = cliente.getCpf();
@@ -2131,20 +2153,25 @@ public class MenuPrincipal {
 				break;
 			default:
 				System.out.println("PIX não cadastrado, tente novamente");
-				opcao = -1;
+				opcao = 0;
 				break;
 			}
 
-			bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix, conteudoChavePix));
-			this.pixBo.addPixConta(bancoDados.acessarContaCorrente(cliente),
-					bancoDados.getPix().get(bancoDados.getPix().size() - 1));
-			if (bancoDados.getPix().get(bancoDados.getPix().size() - 1).isAtivado() == true) {
-				System.out.println("Sua chave pix está ativa.");
-				System.out.println("Tipo de chave selecionada: "
-						+ bancoDados.getPix().get(bancoDados.getPix().size() - 1).getTipoChave());
-				System.out.println("Chave cadastrada: "
-						+ bancoDados.getPix().get(bancoDados.getPix().size() - 1).getConteudoChave());
-			}
+			if (opcao != 0) {
+				bancoDados.cadastrarPix(pixBo.cadastrarPix(tipoChavePix, conteudoChavePix));
+				this.pixBo.addPixConta(bancoDados.acessarContaCorrente(cliente),
+						bancoDados.getPix().get(bancoDados.getPix().size() - 1));
+
+				if (bancoDados.getPix().get(bancoDados.getPix().size() - 1).isAtivado() == true) {
+					System.out.println("Sua chave pix está ativa.");
+					System.out.println("Tipo de chave selecionada: "
+							+ bancoDados.getPix().get(bancoDados.getPix().size() - 1).getTipoChave());
+					System.out.println("Chave cadastrada: "
+							+ bancoDados.getPix().get(bancoDados.getPix().size() - 1).getConteudoChave());
+				} else {
+					System.out.println("Chave Pix já cadastrada!!!");
+				}
+			} 
 		} else {
 			System.out.println("Chave Pix já cadastrada!!!");
 		}
